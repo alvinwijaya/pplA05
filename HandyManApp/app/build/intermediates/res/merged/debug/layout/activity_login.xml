@@ -1,0 +1,92 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".Login"
+    android:background="#48c1df">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/handymanicoo"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HandyMan Hand"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif-condensed"
+        android:layout_marginTop="160dp"/>
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="260dp"
+        android:layout_height="40dp"
+        android:inputType="textEmailAddress"
+        android:hint="Email"
+        android:ems="10"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:background="@drawable/field_shadow"
+        android:fontFamily="sans-serif-light"
+        android:textColor="#2d2d2d"
+        android:textStyle="bold"
+        android:paddingLeft="10dp"
+        />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_below="@+id/username"
+        android:layout_width="260dp"
+        android:layout_height="40dp"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:layout_marginTop="16dp"
+        android:hint="Password"
+        android:layout_centerHorizontal="true"
+        android:textColor="#2d2d2d"
+        android:textStyle="bold"
+        android:background="@drawable/field_shadow"
+        android:fontFamily="sans-serif-light"
+        android:paddingLeft="10dp"/>
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="104dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:text="Login"
+        android:layout_below="@+id/password"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+
+        android:background="@drawable/button_selector"
+        android:textColor="#2d2d2d"
+        android:fontFamily="sans-serif-light"
+
+        android:layout_gravity="center_horizontal"/>
+
+    <TextView
+        android:id="@+id/register"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_centerHorizontal="true"
+        android:text="Not a member? Register Here"
+        android:textAlignment="center"
+        android:textColor="#ffffff"
+        android:textSize="16dp"
+        android:layout_marginTop="380dp"
+        android:textStyle="bold"
+        android:clickable="true"
+        />
+
+</RelativeLayout>
+<!-- From: file:/C:/Users/ASUS/AndroidStudioProjects/HandyMan/app/src/main/res/layout/activity_login.xml -->
