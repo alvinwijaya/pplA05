@@ -8,7 +8,10 @@
         android:minSdkVersion="15"
         android:targetSdkVersion="23" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name="ppl.handyman.AppController"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -21,6 +24,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="ppl.handyman.MainActivity"
+            android:label="@string/title_activity_main" >
         </activity>
     </application>
 
