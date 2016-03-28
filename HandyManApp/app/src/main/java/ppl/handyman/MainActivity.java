@@ -9,16 +9,21 @@ import android.view.View;
 import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-
+    SessionHandler session;
+    SQLiteHandler sql;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button logout = (Button) findViewById(R.id.logout);
+        session = new SessionHandler(getApplicationContext());
+        sql = new SQLiteHandler(getApplicationContext());
         if (logout != null) {
             logout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    session.setLogin(false);
+                    sql.deleteUsers();
                     Intent out = new Intent(MainActivity.this,Login.class);
                     startActivity(out);
                     finish();

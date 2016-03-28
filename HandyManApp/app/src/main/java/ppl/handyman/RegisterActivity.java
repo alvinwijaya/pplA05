@@ -27,11 +27,12 @@ public class RegisterActivity extends Activity {
     private EditText inputName;
     private EditText inputAddress;
     private EditText inputPassword;
+    private EditText inputPhone;
     private Button register;
     private TextView login;
     private ProgressDialog pDialog;
-    private SessionHandler session;
-
+    //private SessionHandler session;
+    private SQLiteHandler sqlhandler;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +40,7 @@ public class RegisterActivity extends Activity {
         inputUsername = (EditText) findViewById(R.id.username);
         inputName = (EditText) findViewById(R.id.name);
         inputAddress = (EditText) findViewById(R.id.address);
+        inputPhone = (EditText) findViewById(R.id.phone);
         inputPassword = (EditText) findViewById(R.id.password);
         register = (Button) findViewById(R.id.register);
         login = (TextView) findViewById(R.id.login);
@@ -48,19 +50,30 @@ public class RegisterActivity extends Activity {
         pDialog.setCancelable(false);
 
         // Session Handler
-        session = new SessionHandler(getApplicationContext());
-
-
+        //session = new SessionHandler(getApplicationContext());
+        sqlhandler = new SQLiteHandler(getApplicationContext());
+        login.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),Login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = inputUsername.getText().toString().trim();
+                String username = inputUsername.getText().toString().trim();
                 String name = inputName.getText().toString();
                 String address = inputAddress.getText().toString();
+                String phone = inputPhone.getText().toString();
                 String password = inputPassword.getText().toString();
 
-                if(!email.isEmpty() && !name.isEmpty() && !address.isEmpty() && !password.isEmpty()){
-                    registerUser(email,name,address,password);
+                if(!username.isEmpty() && !name.isEmpty() && !address.isEmpty() && !phone.isEmpty() && !password.isEmpty()){
+                    registerUser(username,name,password,phone,address);
+                    Intent intent = new Intent(RegisterActivity.this,Login.class);
+                    startActivity(intent);
+                    finish();
                 }
                 else{
                     Toast.makeText(getApplicationContext(),"Please enter your credential",Toast.LENGTH_LONG).show();
@@ -68,12 +81,12 @@ public class RegisterActivity extends Activity {
             }
         });
     }
-    public void registerUser(final String username,final String name,final String address,final String password){
+    public void registerUser(final String username,final String name, final String password,final String phone,final String address){
 
         pDialog.setMessage("Registering ...");
         showDialog();
 
-        StringRequest request = new StringRequest(Request.Method.POST,"http://192.168.43.229/HandyMan/index.php/register", new Response.Listener<String>() {
+        final StringRequest request = new StringRequest(Request.Method.POST,"http://192.168.43.229/HandyMan/index.php/register", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(RegisterActivity.class.getSimpleName(), "Register Response: " + response.toString());
@@ -84,7 +97,18 @@ public class RegisterActivity extends Activity {
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getApplicationContext(),"Something Wrong",Toast.LENGTH_LONG).show();
             }
-        });
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> map = new HashMap<String, String>();
+                map.put("username",username);
+                map.put("password",password);
+                map.put("name",name);
+                map.put("phone",phone);
+                map.put("address",address);
+                return map;
+            }
+        };
         AppController.getInstance().addToRequestQueue(request);
     }
     private void showDialog() {

@@ -16,7 +16,7 @@
         android:paddingRight="20dp" >
 
         <EditText
-            android:id="@+id/email"
+            android:id="@+id/username"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
@@ -25,6 +25,18 @@
             android:padding="10dp"
             android:singleLine="true"
             android:inputType="textEmailAddress"
+            android:textColor="#888888"
+            android:textColorHint="#5e6266" />
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="#3b4148"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="10dp"
+            android:singleLine="true"
             android:textColor="#888888"
             android:textColorHint="#5e6266" />
 
@@ -41,6 +53,19 @@
             android:textColor="#888888"
             android:textColorHint="#5e6266" />
         <EditText
+            android:id="@+id/phone"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="#3b4148"
+            android:hint="Phone"
+            android:inputType="number"
+            android:padding="10dp"
+            android:singleLine="true"
+            android:textColor="#888888"
+            android:textColorHint="#5e6266" />
+
+        <EditText
             android:id="@+id/address"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
@@ -53,18 +78,7 @@
             android:textColor="#888888"
             android:textColorHint="#5e6266" />
 
-        <EditText
-            android:id="@+id/password"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:background="#3b4148"
-            android:hint="Password"
-            android:inputType="textPassword"
-            android:padding="10dp"
-            android:singleLine="true"
-            android:textColor="#888888"
-            android:textColorHint="#5e6266" />
+
 
         <!-- Login Button -->
 
@@ -88,7 +102,8 @@
             android:text="Already Registered! Login here."
             android:textAllCaps="false"
             android:textColor="#ffffff"
-            android:textSize="15dp" />
+            android:textSize="15dp"
+            android:gravity="center"/>
     </LinearLayout>
 
 </LinearLayout>

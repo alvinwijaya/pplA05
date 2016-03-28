@@ -45,12 +45,6 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        inputUsername = (EditText) findViewById(R.id.username);
-        inputPassword = (EditText) findViewById(R.id.password);
-        login = (Button) findViewById(R.id.login);
-        register = (TextView) findViewById(R.id.register);
-
-
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
@@ -60,33 +54,43 @@ public class Login extends AppCompatActivity {
 
         // SQLite database handler
         sqlhandler = new SQLiteHandler(getApplicationContext());
-
-        register.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(getApplicationContext(),
-                        RegisterActivity.class);
-                startActivity(i);
-                finish();
-            }
-        });
-        if (login != null) {
-
-            login.setOnClickListener(new View.OnClickListener() {
+        if(session.isLoggedIn()){
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(i);
+            finish();
+        }else {
+            inputUsername = (EditText) findViewById(R.id.username);
+            inputPassword = (EditText) findViewById(R.id.password);
+            login = (Button) findViewById(R.id.login);
+            register = (TextView) findViewById(R.id.register);
+            register.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
-                    String email = inputUsername.getText().toString().trim();
-                    String password = inputPassword.getText().toString();
-                    boolean emailValid = emailValidator(email);
-                    boolean passwordValid = passwordValidator(password);
-                    if(emailValid && passwordValid ){
-                        authenticate(email,password);
-                    }else {
-                        Toast.makeText(getApplicationContext(),"Invalid email address or password is less than 8 character",Toast.LENGTH_LONG).show();
-                    }
+                    Intent i = new Intent(getApplicationContext(),
+                            RegisterActivity.class);
+                    startActivity(i);
+                    finish();
                 }
             });
+            if (login != null) {
+
+                login.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String email = inputUsername.getText().toString().trim();
+                        String password = inputPassword.getText().toString();
+                        boolean emailValid = emailValidator(email);
+                        boolean passwordValid = passwordValidator(password);
+                        if(emailValid && passwordValid ){
+                            authenticate(email,password);
+                        }else {
+                            Toast.makeText(getApplicationContext(),"Invalid email address or password is less than 8 character",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            }
         }
+
     }
 
     @Override
@@ -119,7 +123,7 @@ public class Login extends AppCompatActivity {
         return password.length() >= 8;
     }
 
-    public void authenticate(final String email, final String password){
+    public void authenticate(final String username, final String password){
         pDialog.setMessage("Logging in ...");
         showDialog();
 
@@ -136,8 +140,10 @@ public class Login extends AppCompatActivity {
                         session.setLogin(true);
                         String username = json.getString("username");
                         String password = json.getString("password");
-                        String name = json.getString("nama");
-                        sqlhandler.addUser(username,password,name);
+                        String name = json.getString("name");
+                        String phone = json.getString("phone");
+                        String address = json.getString("address");
+                        sqlhandler.addUser(username,password,name,phone,address);
                         Intent in = new Intent(Login.this,MainActivity.class);
                         startActivity(in);
                         finish();
@@ -158,7 +164,7 @@ public class Login extends AppCompatActivity {
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> map = new HashMap<String, String>();
-                map.put("username",email);
+                map.put("username",username);
                 map.put("password",password);
                 return map;
             }
