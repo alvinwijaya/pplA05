@@ -37,7 +37,7 @@ $app->get('/', function () {
 
 // POST route .method name
 $app->post('/login', 'login');
-
+$app->post('/register','register');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -68,7 +68,7 @@ function login(){
 
 	$username = $app->request->post('username');
 	$password = $app->request->post('password');
-
+	$password = sha1($password);
 	try{
 		$db = connectDB();
 		$sql = "select * from user where password='$password' and username='$username'";
@@ -78,18 +78,13 @@ function login(){
 		if(empty($fetch)){
 			echo json_encode(to_json(false, "Wrong Username or Password"));
 		}else{
-			$user_id = $fetch->id;
-			$sql_address = "select * from user_address where user_id='$user_id'";
-			$result_address = $db->query($sql_address);
-			$fetch_address = $result_address->fetch(PDO::FETCH_OBJ);
-			//var_dump($fetch_address);
 			$res = array(
 					'status' => true,
-					'alamat' => $fetch_address->alamat,
-					'user_id' => $user_id,
+					'address' => $fetch->address,
 					'username' => $fetch->username,
 					'password' => $fetch->password,
-					'nama'=> $fetch->nama
+					'name'=> $fetch->name,
+					'phone'=> $fetch->phone
 			);
 			echo json_encode($res);
 		}
@@ -101,54 +96,33 @@ function login(){
 
 function register(){
 	$app = \Slim\Slim::getInstance();
-	$app->response()->header("Content-Type","application/json");
+	//$app->response()->header("Content-Type","application/json");
 	//$status = false;
-	$json_data = $app->request()->getBody();
-	$data = json_decode($json_data);
-	$username = $data->username;
-	$password = md5($data->password);
-	$address = $data->address;
-	$name = $data->name;
-	$link_gmaps = $data->link_gmaps;
-	// $password = $data->password;
-
-	//$username = $app->request->post('username');
-	//$password = $app->request->post('password');
+// 	$json_data = $app->request()->getBody();
+// 	$data = json_decode($json_data);
+	$username = $app->request->post('username');
+	$password = sha1($app->request->post('password'));
+	$address = $app->request->post('address');
+	$name = $app->request->post('name');
+	$phone = $app->request->post('phone');
 
 	try{
 		$db = connectDB();
 		$sql_check = "select * from user where username='$username'";
-		$check = $db->exec($sql_check);
-		if(empty($check)){
-			$sql = "insert into user (username, password, nama) values ('$username','$password',$name) ";
-			$result = $db->exec($sql);
-			if(!empty($result)){
-				$sql_address = "insert into user_address (user_id, alamat,link_gmaps) values ('$user_id','$alamat','$link_gmaps')";
-				$result = $db->exec("$sql_address");
-			}
+		$check = $db->query($sql_check);
+		$fetch = $check->fetch(PDO::FETCH_OBJ);
+	
+		if(empty($fetch)){
+			$sql = "insert into user (username, password, name,phone,address) values ('$username','$password','$name','$phone','$address')";
+			$result = $db->query($sql);
+			$res = to_json(true, "Thank you for registering");
+			echo $res;
 		}
 		else{
 			
+			$res = to_json(false, "User already exists");
+			echo $res;
 		}
-		
-		
-		//$fetch = $result->fetch(PDO::FETCH_OBJ);
-		//var_dump($fetch);
-		//if(empty($fetch)){
-		//	echo json_encode(to_json(false, "Wrong Username or Password"));
-		echo "Thank you for your register";
-		// }else{
-		// 	$sql_address = "select * from alamat where usernameFK='$username'";
-		// 	$result_address = $db->query($sql_address);
-		// 	$fetch_address = $result_address->fetch(PDO::FETCH_OBJ);
-		// 	//var_dump($fetch_address);
-		// 	$res = array(
-		// 			'status' => true,
-		// 			'username' => $fetch_address->usernameFK,
-		// 			'address' => $fetch_address->alamat
-		// 	);
-		// 	echo json_encode($res);
-		// }
 	}catch (PDOException $databaseERROR){
 		echo "Something went wrong" . $databaseERROR->getMessage();
 	}
