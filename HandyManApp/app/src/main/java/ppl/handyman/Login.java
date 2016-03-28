@@ -1,5 +1,6 @@
 package ppl.handyman;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,39 +24,63 @@ import com.android.volley.toolbox.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import ppl.handyman.R;
 
 
 public class Login extends AppCompatActivity {
 
-    private Matcher matcher;
-    private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-    private EditText username;
-    private EditText password;
-    private SessionHandler session;
     private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+    private Matcher matcher;
+    private EditText inputUsername;
+    private EditText inputPassword;
+    private Button login;
+    private TextView register;
+    private SessionHandler session;
     private SQLiteHandler sqlhandler;
+    private ProgressDialog pDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        inputUsername = (EditText) findViewById(R.id.username);
+        inputPassword = (EditText) findViewById(R.id.password);
+        login = (Button) findViewById(R.id.login);
+        register = (TextView) findViewById(R.id.register);
+
+
+        // Progress dialog
+        pDialog = new ProgressDialog(this);
+        pDialog.setCancelable(false);
+
+        // Session Handler
         session = new SessionHandler(getApplicationContext());
-        Button login = (Button) findViewById(R.id.login);
-        TextView register = (TextView) findViewById(R.id.register);
-        username = (EditText) findViewById(R.id.username);
-        password = (EditText) findViewById(R.id.password);
+
+        // SQLite database handler
         sqlhandler = new SQLiteHandler(getApplicationContext());
+
+        register.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(),
+                        RegisterActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
         if (login != null) {
+
             login.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String email = username.getText().toString().trim();
-                    String password_value = password.getText().toString();
+                    String email = inputUsername.getText().toString().trim();
+                    String password = inputPassword.getText().toString();
                     boolean emailValid = emailValidator(email);
-                    boolean passwordValid = passwordValidator(password_value);
+                    boolean passwordValid = passwordValidator(password);
                     if(emailValid && passwordValid ){
-                        authenticate(email,password_value);
+                        authenticate(email,password);
                     }else {
                         Toast.makeText(getApplicationContext(),"Invalid email address or password is less than 8 character",Toast.LENGTH_LONG).show();
                     }
@@ -95,9 +120,15 @@ public class Login extends AppCompatActivity {
     }
 
     public void authenticate(final String email, final String password){
+        pDialog.setMessage("Logging in ...");
+        showDialog();
+
         StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/index.php/login", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
+                Log.d(Login.class.getSimpleName(), "Login Response: " + s.toString());
+                hideDialog();
+
                 try{
                     JSONObject json = new JSONObject(s);
                     boolean authorized = json.getBoolean("status");
@@ -115,7 +146,7 @@ public class Login extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),errMsg,Toast.LENGTH_LONG).show();
                     }
                 }catch (JSONException e){
-                        Toast.makeText(getApplicationContext(),"JSON Error kontol " + e.getMessage(),Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
                 }
             }
         }, new Response.ErrorListener() {
@@ -133,5 +164,14 @@ public class Login extends AppCompatActivity {
             }
         };
         AppController.getInstance().addToRequestQueue(request);
+    }
+    private void showDialog() {
+        if (!pDialog.isShowing())
+            pDialog.show();
+    }
+
+    private void hideDialog() {
+        if (pDialog.isShowing())
+            pDialog.dismiss();
     }
 }

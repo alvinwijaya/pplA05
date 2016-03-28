@@ -27,8 +27,10 @@
         </activity>
         <activity
             android:name="ppl.handyman.MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name="ppl.handyman.RegisterActivity"
+            android:label="@string/title_activity_register" />
     </application>
 
 </manifest>
