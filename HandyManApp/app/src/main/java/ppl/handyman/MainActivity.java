@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Button logout = (Button) findViewById(R.id.logout);
+        Button map = (Button) findViewById(R.id.map);
         session = new SessionHandler(getApplicationContext());
         sql = new SQLiteHandler(getApplicationContext());
         if (logout != null) {
@@ -30,6 +31,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(),OrderActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
     }
 
     @Override
