@@ -9,20 +9,17 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    android:background="@drawable/gradient_background"
     android:padding="30dp">
 
         <EditText
             android:id="@+id/username"
 
-            android:hint="Email"
-            android:textColorHint="#d1ffffff"
+			android:hint="Email"
+            android:textColorHint="@color/colorPrimaryDark"
             android:layout_height="50dp"
             android:layout_width="match_parent"
-            android:background="@drawable/field_fades"
-            android:paddingLeft="20dp"
             android:layout_marginTop="10dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorPrimaryDark"
             android:fontFamily="sans-serif-light"
             android:textSize="8pt"
             />
@@ -31,13 +28,11 @@
             android:id="@+id/password"
 
             android:hint="Password"
-            android:textColorHint="#d1ffffff"
+            android:textColorHint="@color/colorPrimaryDark"
             android:layout_height="50dp"
             android:layout_width="match_parent"
-            android:background="@drawable/field_fades"
-            android:paddingLeft="20dp"
             android:layout_marginTop="10dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorPrimaryDark"
             android:fontFamily="sans-serif-light"
             android:textSize="8pt"
             />
@@ -45,27 +40,23 @@
             android:id="@+id/name"
 
             android:hint="Name"
-            android:textColorHint="#d1ffffff"
+            android:textColorHint="@color/colorPrimaryDark"
             android:layout_height="50dp"
             android:layout_width="match_parent"
-            android:background="@drawable/field_fades"
-            android:paddingLeft="20dp"
             android:layout_marginTop="10dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorPrimaryDark"
             android:fontFamily="sans-serif-light"
             android:textSize="8pt"
             />
         <EditText
             android:id="@+id/phone"
 
-            android:hint="Mobile Phone..."
-            android:textColorHint="#d1ffffff"
+            android:hint="Mobile Phone"
+            android:textColorHint="@color/colorPrimaryDark"
             android:layout_height="50dp"
             android:layout_width="match_parent"
-            android:background="@drawable/field_fades"
-            android:paddingLeft="20dp"
             android:layout_marginTop="10dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorPrimaryDark"
             android:fontFamily="sans-serif-light"
             android:textSize="8pt"
             />
@@ -73,17 +64,15 @@
             android:id="@+id/address"
 
             android:hint="Address"
-            android:textColorHint="#d1ffffff"
+            android:textColorHint="@color/colorPrimaryDark"
             android:layout_width="match_parent"
             android:layout_height="140dp"
             android:gravity="top"
             android:inputType="textMultiLine"
-            android:background="@drawable/field_fades"
-            android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingTop="10dp"
             android:layout_marginTop="10dp"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorPrimaryDark"
             android:fontFamily="sans-serif-light"
             android:textSize="8pt"
             />
@@ -92,7 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Register"
-            android:textColorHint="#d1ffffff"
+            android:textColorHint="@color/colorPrimaryDark"
             android:fontFamily="sans-serif-light"
             android:textSize="8pt"
             android:layout_gravity="center"
@@ -107,7 +96,7 @@
             android:background="@null"
             android:text="Already Registered! Login here."
             android:textAllCaps="false"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorPrimaryDark"
             android:textSize="8pt"
             android:gravity="center"/>
 
