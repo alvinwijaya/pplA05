@@ -26,8 +26,8 @@
 
         <EditText
             android:id="@+id/password"
-
             android:hint="Password"
+            android:inputType="textPassword"
             android:textColorHint="@color/colorPrimaryDark"
             android:layout_height="50dp"
             android:layout_width="match_parent"

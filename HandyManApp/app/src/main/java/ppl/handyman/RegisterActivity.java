@@ -81,6 +81,14 @@ public class RegisterActivity extends Activity {
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(RegisterActivity.this,Login.class);
+        startActivity(intent);
+        finish();
+    }
+
     public void registerUser(final String username,final String name, final String password,final String phone,final String address){
 
         pDialog.setMessage("Registering ...");
@@ -114,7 +122,7 @@ public class RegisterActivity extends Activity {
     private void showDialog() {
     if (!pDialog.isShowing())
             pDialog.show();
-}
+    }
 
     private void hideDialog() {
         if (pDialog.isShowing())

@@ -71,7 +71,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         values.put(KEY_ADDRESS, address); // address
 
         // Inserting Row
-        long id = db.insert(TABLE_USER, null, values);
+        long id = db.insert(TABLE_USER, "lattitude,longitude", values);
         db.close(); // Closing database connection
 
         Log.d(TAG, "New user inserted into sqlite: " + id);
