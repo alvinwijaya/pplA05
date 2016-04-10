@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:textAlignment="center"
+    >
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        android:layout_marginBottom="10dp"
+        >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_search"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.25"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorPrimaryDark"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_history"
+
+            android:layout_weight="0.25"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorPrimary"
+            />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_fave"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.25"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorPrimary"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_profile"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.25"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorPrimary"
+            />
+    </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Silahkan Pilih Kategori Tukang"
+        android:fontFamily="sans-serif"
+        android:textSize="18dp"
+
+        android:textColor="@color/colorPrimaryDark"
+        android:textAlignment="center"
+        android:textStyle="bold"/>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp"
+        >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_AC"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_Air"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_Bengkel"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+    </LinearLayout>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_Besi"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_CAT"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_Kayu"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+    </LinearLayout>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_Listrik"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_Taman"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ic_Tembok"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            />
+    </LinearLayout>
+    <Spinner
+        style="@style/spinnerItemStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/address_prompt"
+        android:entries="@array/address_array"
+        />
+
+<Button
+    android:layout_gravity="center_horizontal"
+    android:layout_width="120dp"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:text="Cari"
+    android:fontFamily="sans-serif"
+    android:textColor="@color/colorPrimaryDark"
+    android:textSize="18sp"
+    android:textAlignment="center"
+    android:background="@drawable/button_invisible"/>
+
+
+</LinearLayout>

@@ -6,4 +6,10 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_register">Register</string>
     <string name="title_activity_order">Map</string>
+ <string name="address_prompt">Silahkan Pilih Alamat</string>
+    <string-array name="address_array">
+        <item>Alamat1</item>
+        <item>Alamat2</item>
+        <item>Alamat3</item>
+    </string-array>
 </resources>
