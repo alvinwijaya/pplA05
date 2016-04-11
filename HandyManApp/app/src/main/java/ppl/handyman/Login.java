@@ -54,7 +54,7 @@ public class Login extends AppCompatActivity {
         // SQLite database handler
         sqlhandler = new SQLiteHandler(getApplicationContext());
         if(session.isLoggedIn()){
-            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
             startActivity(i);
             finish();
         }else {
@@ -65,8 +65,7 @@ public class Login extends AppCompatActivity {
             register.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(getApplicationContext(),
-                            RegisterActivity.class);
+                    Intent i = new Intent(getApplicationContext(), RegisterActivity.class);
                     startActivity(i);
                     finish();
                 }
@@ -92,27 +91,7 @@ public class Login extends AppCompatActivity {
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_login, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
     public boolean emailValidator(String email){
         matcher = pattern.matcher(email);
         return matcher.matches();
@@ -138,12 +117,11 @@ public class Login extends AppCompatActivity {
                     if(authorized){
                         session.setLogin(true);
                         String username = json.getString("username");
-                        String password = json.getString("password");
                         String name = json.getString("name");
                         String phone = json.getString("phone");
                         String address = json.getString("address");
-                        sqlhandler.addUser(username,password,name,phone,address);
-                        Intent in = new Intent(Login.this,MainActivity.class);
+                        sqlhandler.addUser(username,name,phone,address);
+                        Intent in = new Intent(Login.this,DashboardActivity.class);
                         startActivity(in);
                         finish();
                     }else {

@@ -27,7 +27,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
 
     // Login Table Columns names
     private static final String KEY_USERNAME = "username";
-    private static final String KEY_PASSWORD = "password";
     private static final String KEY_NAME = "name";
     private static final String KEY_PHONE = "phone";
     private static final String KEY_ADDRESS = "address";
@@ -40,7 +39,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_LOGIN_TABLE = "CREATE TABLE " + TABLE_USER + "("
                 + KEY_USERNAME + " varchar(255) PRIMARY KEY,"
-                + KEY_PASSWORD + " text," + KEY_NAME + " varchar(255),"
+                + KEY_NAME + " varchar(255),"
                 + KEY_PHONE + " varchar(255)," + KEY_ADDRESS + " text"
                 +")";
         db.execSQL(CREATE_LOGIN_TABLE);
@@ -60,12 +59,11 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addUser(String username, String password, String name, String phone, String address) {
+    public void addUser(String username, String name, String phone,String address) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_USERNAME, username); // email
-        values.put(KEY_PASSWORD, password); // Password
         values.put(KEY_NAME, name); // Person name
         values.put(KEY_PHONE, phone); // phone
         values.put(KEY_ADDRESS, address); // address
@@ -90,10 +88,9 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
             user.put("username", cursor.getString(1));
-            user.put("password", cursor.getString(2));
-            user.put("name", cursor.getString(3));
-            user.put("phone", cursor.getString(4));
-            user.put("address", cursor.getString(5));
+            user.put("name", cursor.getString(2));
+            user.put("phone", cursor.getString(3));
+            user.put("address", cursor.getString(4));
         }
         cursor.close();
         db.close();

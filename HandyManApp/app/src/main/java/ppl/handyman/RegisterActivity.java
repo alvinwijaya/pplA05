@@ -21,8 +21,13 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RegisterActivity extends Activity {
+    private static final String EMAIL_PATTERN = "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
+    private final Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+    private Matcher matcher;
     private EditText inputUsername;
     private EditText inputName;
     private EditText inputAddress;
@@ -70,10 +75,15 @@ public class RegisterActivity extends Activity {
                 String password = inputPassword.getText().toString();
 
                 if(!username.isEmpty() && !name.isEmpty() && !address.isEmpty() && !phone.isEmpty() && !password.isEmpty()){
-                    registerUser(username,name,password,phone,address);
-                    Intent intent = new Intent(RegisterActivity.this,Login.class);
-                    startActivity(intent);
-                    finish();
+                    if(emailValidator(username) && password.length() > 7){
+                        registerUser(username,name,password,phone,address);
+                        Intent intent = new Intent(RegisterActivity.this,Login.class);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        Toast.makeText(getApplicationContext(),"Email must be valid email address and password minimal 8 character long",Toast.LENGTH_LONG).show();
+                    }
+
                 }
                 else{
                     Toast.makeText(getApplicationContext(),"Please enter your credential",Toast.LENGTH_LONG).show();
@@ -81,7 +91,10 @@ public class RegisterActivity extends Activity {
             }
         });
     }
-
+    public boolean emailValidator(String email){
+        matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(RegisterActivity.this,Login.class);

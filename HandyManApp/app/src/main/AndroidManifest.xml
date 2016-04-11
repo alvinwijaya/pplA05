@@ -33,10 +33,7 @@
             android:label="@string/title_activity_register" >
         </activity>
         <activity
-            android:name=".MainActivity"
-            android:label="@string/title_activity_main" >
-        </activity>
-        <activity
+
             android:name=".OrderActivity"
             android:label="@string/title_activity_order" >
         </activity>

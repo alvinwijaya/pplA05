@@ -27,7 +27,7 @@
             android:layout_weight="0.25"
             android:layout_gravity="center_horizontal"
             android:background="@color/colorPrimaryDark"
-            />
+            android:id="@+id/search" />
 
         <ImageView
             android:layout_width="0dp"
@@ -38,7 +38,7 @@
             android:layout_weight="0.25"
             android:layout_gravity="center_horizontal"
             android:background="@color/colorPrimary"
-            />
+            android:id="@+id/history" />
         <ImageView
             android:layout_width="0dp"
             android:layout_height="50dp"
@@ -48,7 +48,7 @@
             android:layout_weight="0.25"
             android:layout_gravity="center_horizontal"
             android:background="@color/colorPrimary"
-            />
+            android:id="@+id/fave" />
 
         <ImageView
             android:layout_width="0dp"
@@ -59,7 +59,7 @@
             android:layout_weight="0.25"
             android:layout_gravity="center_horizontal"
             android:background="@color/colorPrimary"
-            />
+            android:id="@+id/profile" />
     </LinearLayout>
     <TextView
         android:layout_width="match_parent"
@@ -88,7 +88,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/ac" />
 
         <ImageView
             android:layout_width="0dp"
@@ -97,7 +97,7 @@
             android:src="@drawable/air"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/air" />
         <ImageView
             android:layout_width="0dp"
             android:layout_height="100dp"
@@ -106,7 +106,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/bengkel" />
     </LinearLayout>
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -124,7 +124,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/besi" />
 
         <ImageView
             android:layout_width="0dp"
@@ -133,7 +133,7 @@
             android:src="@drawable/cat"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/cat" />
         <ImageView
             android:layout_width="0dp"
             android:layout_height="100dp"
@@ -142,7 +142,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/kayu" />
     </LinearLayout>
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -160,7 +160,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/listrik" />
 
         <ImageView
             android:layout_width="0dp"
@@ -169,7 +169,7 @@
             android:src="@drawable/taman"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/taman" />
         <ImageView
             android:layout_width="0dp"
             android:layout_height="100dp"
@@ -178,7 +178,7 @@
             android:layout_centerHorizontal="true"
             android:layout_weight="0.3"
             android:layout_gravity="center_horizontal"
-            />
+            android:id="@+id/tembok" />
     </LinearLayout>
     <Spinner
         style="@style/spinnerItemStyle"
