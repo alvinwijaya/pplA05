@@ -5,4 +5,8 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="AppTheme.AppBarOverlay"></style>
+
+    <style name="AppTheme.PopupOverlay"></style>
+
 </resources>

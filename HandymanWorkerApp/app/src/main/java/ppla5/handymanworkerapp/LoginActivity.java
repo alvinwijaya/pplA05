@@ -123,7 +123,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 try{
                     JSONObject json = new JSONObject(s);
-                    boolean authorized = json.getBoolean("status");
+                    boolean authorized = json.getBoolean("sts");
                     if(authorized){
                         session.setLogin(true);
                         String username = json.getString("username");

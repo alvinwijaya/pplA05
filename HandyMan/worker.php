@@ -37,7 +37,7 @@ $app->get('/', function () {
 
 // POST route .method name
 $app->post('/login', 'login');
-
+$app->post('/register','register');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -71,7 +71,7 @@ function login(){
 	$password = sha1($password);
 	try{
 		$db = connectDB();
-		$sql = "select * from user where password='$password' and username='$username'";
+		$sql = "select * from worker where password='$password' and username='$username'";
 		$result = $db->query($sql);
 		$fetch = $result->fetch(PDO::FETCH_OBJ);
 		//var_dump($fetch);
@@ -79,7 +79,7 @@ function login(){
 			echo json_encode(to_json(false, "Wrong Username or Password"));
 		}else{
 			$res = array(
-					'status' => true,
+					'sts' => true,
 					'username' => $fetch->username,
 					'password' => $fetch->password,
 					'name' => $fetch->name,
@@ -96,8 +96,54 @@ function login(){
 	}catch (PDOException $databaseERROR){
 		echo "Something went wrong";
 	}
+
 	
 }
+
+function register(){
+	$app = \Slim\Slim::getInstance();
+	//$app->response()->header("Content-Type","application/json");
+	//$status = false;
+// 	$json_data = $app->request()->getBody();
+// 	$data = json_decode($json_data);
+	$username = $app->request->post('username');
+	$password = sha1($app->request->post('password'));
+	$address = $app->request->post('address');
+	$name = $app->request->post('name');
+	$tag = $app->request->post('tag');
+
+	try{
+		$db = connectDB();
+		$sql_check = "select * from worker where username='$username'";
+		$check = $db->query($sql_check);
+		$fetch = $check->fetch(PDO::FETCH_OBJ);
+	
+		if(empty($fetch)){
+			//address,latitude,longitude,
+			$sql = "insert into worker (username, password, name,address,tag) values ('$username','$password','$name','$address','$tag')";
+			$result = $db->query($sql);
+			$res = to_json(true, "Thank you for registering");
+			echo $res;
+		}
+		else{
+			
+			$res = to_json(false, "User already exists");
+			echo $res;
+		}
+	}catch (PDOException $databaseERROR){
+		echo "Something went wrong" . $databaseERROR->getMessage();
+	}
+	
+}
+
+
+function to_json($status,$message){
+	$row = array('status' => $status, 'message' => $message);
+	return json_encode($row);
+}
+
+
+
 
 function connectDB(){
 	try{
