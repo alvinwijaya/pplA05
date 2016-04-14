@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:textAlignment="center"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Silahkan Pilih Kategori Tukang"
+        android:fontFamily="sans-serif"
+        android:textSize="18dp"
+
+        android:textColor="@color/colorPrimaryDark"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:id="@+id/textView"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/ac"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/ac" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:src="@drawable/air"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/air" />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/bengkel"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/bengkel" />
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout2"
+        android:layout_below="@+id/linearLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/besi"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/besi" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:src="@drawable/cat"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/cat" />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/kayu"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/kayu" />
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/linearLayout3"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true">
+
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/listrik"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/listrik" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="10dp"
+            android:src="@drawable/taman"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/taman" />
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:padding="5dp"
+            android:src="@drawable/tembok"
+            android:layout_centerHorizontal="true"
+            android:layout_weight="0.3"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/tembok" />
+    </LinearLayout>
+    <Spinner
+        style="@style/spinnerItemStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:prompt="@string/address_prompt"
+        android:entries="@array/address_array"
+        android:id="@+id/spinner"
+        android:layout_below="@+id/linearLayout3"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_gravity="center_horizontal"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Cari"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:background="@drawable/button_invisible"
+        android:id="@+id/button"
+        android:layout_below="@+id/spinner"
+        android:layout_centerHorizontal="true" />
+
+
+</RelativeLayout>
