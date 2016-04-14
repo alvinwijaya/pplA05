@@ -5,12 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.TreeSet;
 
 public class findWorkerActivity extends AppCompatActivity {
     SessionHandler session;
+    Button order;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,6 +23,15 @@ public class findWorkerActivity extends AppCompatActivity {
         String [] picked = session.getPickedCategory();
         String category1 = picked[0];
         String category2 = picked[1];
+        order = (Button) findViewById(R.id.order);
+        order.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(),OrderActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
     }
 
     @Override

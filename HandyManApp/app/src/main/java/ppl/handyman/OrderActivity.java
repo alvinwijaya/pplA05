@@ -1,12 +1,20 @@
 package ppl.handyman;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -16,16 +24,26 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
-public class OrderActivity extends FragmentActivity {
+public class OrderActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private EditText address;
+    private GoogleApiClient mGoogleApiClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+        mGoogleApiClient.connect();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
         setUpMapIfNeeded();
-        address = (EditText)findViewById(R.id.searchLocation);
+        address = (EditText) findViewById(R.id.searchLocation);
         /*
         Text watcher is a listener for text when text value changed
          */
@@ -46,14 +64,14 @@ public class OrderActivity extends FragmentActivity {
                 try {
                     String address_value = address.getText().toString().trim();
                     Geocoder geocoder = new Geocoder(getApplicationContext());
-                    List<Address> addresses = geocoder.getFromLocationName(address_value,1);
-                    if(addresses.size() > 0){
+                    List<Address> addresses = geocoder.getFromLocationName(address_value, 1);
+                    if (addresses.size() > 0) {
                         double lat = addresses.get(0).getLatitude();
                         double lgn = addresses.get(0).getLongitude();
                         mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(lat,lgn)).title("Location"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat,lgn), 17.0f));
-                    }else{
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Location"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
+                    } else {
                         //this location supposed to be your current location (still hardcoded)
                         mMap.clear();
                         mMap.addMarker(new MarkerOptions().position(new LatLng(-6.364542, 106.828671)).title("Location"));
@@ -66,6 +84,23 @@ public class OrderActivity extends FragmentActivity {
         };
         address.addTextChangedListener(watcher);
 
+    }
+
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(getApplicationContext(), findWorkerActivity.class);
+        startActivity(i);
+        finish();
     }
 
     @Override
@@ -120,5 +155,32 @@ public class OrderActivity extends FragmentActivity {
         //this location supposed to be your current location (still hardcoded)
         mMap.addMarker(new MarkerOptions().position(new LatLng(-6.364542, 106.828671)).title("Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-6.364542, 106.828671), 17.0f));
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for Activity#requestPermissions for more details.
+            return;
+        }
+        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 }

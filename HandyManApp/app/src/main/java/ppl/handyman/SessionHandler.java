@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
+
+import java.util.TreeSet;
+
 /**
  * Created by ASUS on 3/26/2016.
  */
@@ -41,6 +44,17 @@ public class SessionHandler {
     }
 
     public boolean isLoggedIn(){
+
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
+    }
+
+    public void setPickedCategory(TreeSet<String> pickedCategory){
+        editor.putStringSet("Picked Category",pickedCategory);
+        editor.commit();
+    }
+
+    public  String[] getPickedCategory(){
+        TreeSet<String> set = new TreeSet<>();
+        return  pref.getStringSet("Picked Category",set).toArray(new String[set.size()]);
     }
 }
