@@ -29,7 +29,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private EditText address;
     private GoogleApiClient mGoogleApiClient;
-
+    private double latitude;
+    private double longitude;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (mGoogleApiClient == null) {
@@ -39,6 +40,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     .addApi(LocationServices.API)
                     .build();
         }
+
+        latitude = getIntent().getDoubleExtra("latitude",0.0);
+        longitude = getIntent().getDoubleExtra("longitude",0.0);
         mGoogleApiClient.connect();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
@@ -74,8 +78,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     } else {
                         //this location supposed to be your current location (still hardcoded)
                         mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(-6.364542, 106.828671)).title("Location"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-6.364542, 106.828671), 17.0f));
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -153,24 +157,15 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
      */
     private void setUpMap() {
         //this location supposed to be your current location (still hardcoded)
-        mMap.addMarker(new MarkerOptions().position(new LatLng(-6.364542, 106.828671)).title("Location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-6.364542, 106.828671), 17.0f));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
     }
 
     @Override
     public void onConnected(Bundle bundle) {
 
-        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    public void requestPermissions(@NonNull String[] permissions, int requestCode)
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
-            return;
-        }
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+        
 
     }
 
