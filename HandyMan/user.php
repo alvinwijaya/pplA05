@@ -36,8 +36,7 @@ $app->get('/', function () {
 });
 
 // POST route .method name
-$app->post('/login', 'login');
-$app->post('/register','register');
+$app->post('/getworker','getWorkerByCategories');
 
 // PUT route
 $app->put('/put',function() {
@@ -57,38 +56,39 @@ $app->delete(
     }
 );
 
-function login(){
+function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
-	//$app->response()->header("Content-Type","application/json");
-	$status = false;
-	// $json_data = $app->request()->getBody();
-	// $data = json_encode($json_data);
-	// $username = $data->username;
-	// //$password = md5($data->password);
-	// $password = $data->password;
+	$error = false;
+	// categories are array of string
+	$categories = $app->request->post('categories');
 
-	$username = $app->request->post('username');
-	$password = $app->request->post('password');
-	$password = sha1($password);
 	try{
+		$category1 = $categories[0];
+		$category2 = $categories[1];
 		$db = connectDB();
-		$sql = "select * from user where password='$password' and username='$username'";
+		$sql = "select * from worker where tag LIKE '%$category1%' OR tag LIKE '%$category2%'";
 		$result = $db->query($sql);
-		$fetch = $result->fetch(PDO::FETCH_OBJ);
-		//var_dump($fetch);
+		$fetch = $result->fetchAll(PDO::FETCH_ASSOC);
 		if(empty($fetch)){
-			echo json_encode(to_json(false, "Wrong Username or Password"));
+			echo json_encode(to_json(true, "can't find worker"));
 		}else{
-			$res = array(
-					'status' => true,
-					'address' => $fetch->address,
-					'username' => $fetch->username,
-					'password' => $fetch->password,
-					'name'=> $fetch->name,
-					'phone'=> $fetch->phone,
-					'latitude'=> $fetch->latitude,
-					'longitude' => $fetch->longitude
-			);
+			$res = array();
+			foreach ($fetch as $row) {
+				array_push(
+					$res,
+					array(
+						'error' => false,
+						'address' => $row['address'],
+						'tag' => $row['tag'],
+						'rating' => $row['rating'],
+						'status' => $row['status'],
+						'name'=> $row['name'],
+						'photo'=> $row['photo'],
+						'latitude'=> $row['latitude'],
+						'longitude' => $row['longitude']
+					)
+				);
+			}
 			echo json_encode($res);
 		}
 	}catch (PDOException $databaseERROR){
@@ -118,12 +118,12 @@ function register(){
 		if(empty($fetch)){
 			$sql = "insert into user (username, password, name,phone,address) values ('$username','$password','$name','$phone','$address')";
 			$result = $db->query($sql);
-			$res = to_json(true, "Thank you for registering");
+			$res = to_json(false, "Thank you for registering");
 			echo $res;
 		}
 		else{
 			
-			$res = to_json(false, "User already exists");
+			$res = to_json(true, "User already exists");
 			echo $res;
 		}
 	}catch (PDOException $databaseERROR){
@@ -131,8 +131,8 @@ function register(){
 	}
 	
 }
-function to_json($status,$message){
-	$row = array('status' => $status, 'message' => $message);
+function to_json($error,$message){
+	$row = array('error' => $error, 'message' => $message);
 	return json_encode($row);
 }
 function connectDB(){
@@ -156,3 +156,4 @@ function connectDB(){
  * and returns the HTTP response to the HTTP client.
  */
 $app->run();
+// 
