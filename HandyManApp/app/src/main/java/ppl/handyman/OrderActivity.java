@@ -12,9 +12,15 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -25,17 +31,26 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrderActivity extends FragmentActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private EditText address;
     private GoogleApiClient mClient;
-    Location currentLoc;
-    LocationManager locationManager;
-    SessionHandler session;
+    private Location currentLoc;
+    private LocationManager locationManager;
+    private SessionHandler session;
+    private SQLiteHandler sqlhandler;
     private double latitude;
     private double longitude;
     @Override
@@ -44,6 +59,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         setContentView(R.layout.activity_order);
 
         session = new SessionHandler(getApplicationContext());
+        sqlhandler = new SQLiteHandler(getApplicationContext());
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
 
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
@@ -81,7 +97,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             }
         }
 
-        String [] picked = session.getPickedCategory();
+        String[] picked = session.getPickedCategory();
         String category1 = "";
         String category2 = "";
         if (picked.length > 0){
@@ -90,6 +106,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 category2 = picked[1];
             }
         }
+        getWorker(picked);
         setUpMapIfNeeded();
         address = (EditText) findViewById(R.id.searchLocation);
         /*
@@ -151,6 +168,43 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
         return true;
     }
+
+    public void getWorker(final String[] picked){
+
+
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/getworker", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                try{
+                    JSONArray jsonArr = new JSONArray(s);
+                    boolean authorized = true;
+                    if(authorized){
+                        session.setLogin(true);
+                        String username = jsonArr.getString(0);
+                        Log.e("JSONResult:",jsonArr.toString());
+                    }
+                }catch (JSONException e){
+                    Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(getApplicationContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                List<String> arr = new ArrayList<>(Arrays.asList(picked));
+                JSONArray pickedCategories = new JSONArray(arr);
+                Map<String,String> map = new HashMap<>();
+                map.put("categories",pickedCategories.toString());
+                return map;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(request);
+    }
+
 
     protected void onStart() {
         super.onStart();
