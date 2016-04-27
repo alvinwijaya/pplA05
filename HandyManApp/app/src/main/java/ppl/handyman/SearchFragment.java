@@ -70,7 +70,7 @@ public class SearchFragment extends Fragment {
             public void onClick(View v) {
                 //save data to a bundle so data wont be destroyed
                 session.setPickedCategory(pickedCategory);
-                Intent intent = new Intent(getContext(),findWorkerActivity.class);
+                Intent intent = new Intent(getContext(),OrderActivity.class);
                 startActivity(intent);
             }
         });

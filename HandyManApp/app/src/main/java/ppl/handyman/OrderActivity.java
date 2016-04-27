@@ -1,18 +1,22 @@
 package ppl.handyman;
 
-import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
+import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,24 +32,64 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
     private EditText address;
-    private GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mClient;
+    Location currentLoc;
+    LocationManager locationManager;
+    SessionHandler session;
     private double latitude;
     private double longitude;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-
-        latitude = getIntent().getDoubleExtra("latitude",0.0);
-        longitude = getIntent().getDoubleExtra("longitude",0.0);
-        mGoogleApiClient.connect();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
+
+        session = new SessionHandler(getApplicationContext());
+        locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
+            alertLocation.setMessage("Let Google help apps to determine location. This means sending anonymous location data to Google.").setTitle("Use Location?");
+            alertLocation.setCancelable(false);
+            alertLocation.setPositiveButton("AGREE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(gpsOptionsIntent);
+                    finish();
+                }
+            });
+            alertLocation.setNegativeButton("DISAGREE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent i = new Intent(getApplicationContext(),DashboardActivity.class);
+                    dialog.dismiss();
+                    startActivity(i);
+                    finish();
+
+                }
+            });
+            alertLocation.create().show();
+
+        }
+        if(checkPlayServices()){
+            if (mClient == null) {
+                mClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
+            }
+        }
+
+        String [] picked = session.getPickedCategory();
+        String category1 = "";
+        String category2 = "";
+        if (picked.length > 0){
+            category1 = picked[0];
+            if(picked.length > 1){
+                category2 = picked[1];
+            }
+        }
         setUpMapIfNeeded();
         address = (EditText) findViewById(R.id.searchLocation);
         /*
@@ -90,19 +134,39 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     }
 
+    private boolean checkPlayServices() {
+        int resultCode = GooglePlayServicesUtil
+                .isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (GooglePlayServicesUtil.isUserRecoverableError(resultCode)) {
+                GooglePlayServicesUtil.getErrorDialog(resultCode, this,
+                        1000).show();
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        "This device is not supported.", Toast.LENGTH_LONG)
+                        .show();
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
+
     protected void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        mClient.connect();
+
     }
 
     protected void onStop() {
-        mGoogleApiClient.disconnect();
         super.onStop();
+        mClient.disconnect();
+
     }
 
     @Override
     public void onBackPressed() {
-        Intent i = new Intent(getApplicationContext(), findWorkerActivity.class);
+        Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
         startActivity(i);
         finish();
     }
@@ -163,10 +227,15 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
+        currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
+        if(currentLoc != null){
+            latitude = currentLoc.getLatitude();
+            longitude = currentLoc.getLongitude();
+            mMap.clear();
+            setUpMap();
+            Toast.makeText(getApplicationContext(),latitude+" "+longitude,Toast.LENGTH_LONG).show();
 
-
-        
-
+        }
     }
 
     @Override
@@ -176,6 +245,16 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
+        alertLocation.setMessage("There is no connection available, please enable your cellular data or connect to WiFi").setTitle("Disconnected from Internet");
+        alertLocation.setCancelable(false);
+        alertLocation.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent OptionsIntent = new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
+                startActivity(OptionsIntent);
+                finish();
+            }
+        });
     }
 }

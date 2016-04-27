@@ -27,8 +27,9 @@ public class findWorkerActivity extends AppCompatActivity implements GoogleApiCl
     SessionHandler session;
     Button order;
     Location currentLoc;
-    private GoogleApiClient mClient;
     LocationManager locationManager;
+    private GoogleApiClient mClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
