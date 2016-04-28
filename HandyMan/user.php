@@ -60,11 +60,9 @@ function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
 	// categories are array of string
-	$categories = $app->request->post('categories');
-
+	$category1 = $app->request->post('category1');
+	$category2 = $app->request->post('category2');
 	try{
-		$category1 = $categories[0];
-		$category2 = $categories[1];
 		$db = connectDB();
 		$sql = "select * from worker where tag LIKE '%$category1%' OR tag LIKE '%$category2%'";
 		$result = $db->query($sql);
