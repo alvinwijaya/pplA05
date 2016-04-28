@@ -51,8 +51,11 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private LocationManager locationManager;
     private SessionHandler session;
     private SQLiteHandler sqlhandler;
+    private ArrayList<JSONObject> filtered;
+    private final double DISTANCE_TO_WORKER = 5000;
     private double latitude;
     private double longitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +64,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         session = new SessionHandler(getApplicationContext());
         sqlhandler = new SQLiteHandler(getApplicationContext());
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
+        filtered = new ArrayList<>();
 
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
@@ -160,17 +164,53 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
         return true;
     }
+    public void putMarker(){
+        mMap.clear();
+        setUpMap();
+        for(JSONObject json: this.filtered){
+            try {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + "Location"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+    public void putMarkerWithoutCurrentLocation(){
+        mMap.clear();
+        for(JSONObject json: this.filtered){
+            try {
+                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + "Location"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
     public void getWorker(final String[] picked){
 
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.159/HandyMan/user.php/getworker", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/getworker", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try{
                     JSONArray jsonArr = new JSONArray(s);
+                    filtered = new ArrayList<>();
                     Log.d("JSONResult:",jsonArr.toString());
+                    if (currentLoc!=null){
+                        for(int ii =0; ii < jsonArr.length();ii++){
 
+                            Location locationLatLng = new Location("A");
+                            JSONObject json = jsonArr.getJSONObject(ii);
+                            locationLatLng.setLatitude(json.getDouble("latitude"));
+                            locationLatLng.setLongitude(json.getDouble("longitude"));
+
+                            double distance = currentLoc.distanceTo(locationLatLng);
+                            if(distance < DISTANCE_TO_WORKER){
+                                filtered.add(json);
+                            }
+                        }
+                        putMarker();
+                    }
                 }catch (JSONException e){
                     Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
                 }
@@ -186,9 +226,11 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 List<String> pickedCategories = new ArrayList<>(Arrays.asList(picked));
                 Map<String,String> map = new HashMap<>();
                 map.put("category1",pickedCategories.get(0));
-                map.put("category2",pickedCategories.get(1));
+                if(pickedCategories.size() > 1){
+                    map.put("category2",pickedCategories.get(1));
+                }
+
                 return map;
-                //jalan indofaria barat 1 blok d capling 1
             }
         };
         AppController.getInstance().addToRequestQueue(request);
@@ -248,8 +290,11 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     @Override
                     public void onMapClick(LatLng latLng) {
                         mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("Location"));
+                        mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+                        String[] picked = session.getPickedCategory();
+                        getWorker(picked);
+                        putMarkerWithoutCurrentLocation();
                     }
                 });
             }
@@ -264,7 +309,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
      */
     private void setUpMap() {
         //this location supposed to be your current location (still hardcoded)
-        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
+        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Your Location"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
     }
 
@@ -274,6 +319,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         if(currentLoc != null){
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
+            Log.d("Location: ",latitude+" "+longitude);
             mMap.clear();
             setUpMap();
             Toast.makeText(getApplicationContext(),latitude+" "+longitude,Toast.LENGTH_LONG).show();

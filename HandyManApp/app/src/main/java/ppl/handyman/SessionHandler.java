@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
+import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -56,5 +57,8 @@ public class SessionHandler {
     public  String[] getPickedCategory(){
         TreeSet<String> set = new TreeSet<>();
         return  pref.getStringSet("Picked Category",set).toArray(new String[set.size()]);
+    }
+    public Set getCategoryAsSet(){
+        return pref.getStringSet("Picked Category",new TreeSet<String>());
     }
 }

@@ -43,8 +43,9 @@ public class SearchFragment extends Fragment {
         super.onCreate(savedInstanceState);
         session = new SessionHandler(getContext());
         sql = new SQLiteHandler(getContext());
-        pickedCategory = new TreeSet<>();
         session = new SessionHandler(getContext());
+        pickedCategory = new TreeSet<>();
+
     }
 
     @Override
@@ -69,9 +70,13 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //save data to a bundle so data wont be destroyed
+                if(pickedCategory.size()==0){
+                    Toast.makeText(getActivity(),"You must choose at least 1 category",Toast.LENGTH_LONG).show();
+                }else{
                 session.setPickedCategory(pickedCategory);
                 Intent intent = new Intent(getContext(),OrderActivity.class);
                 startActivity(intent);
+                }
             }
         });
         ac.setOnClickListener(new View.OnClickListener() {
