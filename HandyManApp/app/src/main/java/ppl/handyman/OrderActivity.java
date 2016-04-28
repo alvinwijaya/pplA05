@@ -98,14 +98,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
 
         String[] picked = session.getPickedCategory();
-        String category1 = "";
-        String category2 = "";
-        if (picked.length > 0){
-            category1 = picked[0];
-            if(picked.length > 1){
-                category2 = picked[1];
-            }
-        }
         getWorker(picked);
         setUpMapIfNeeded();
         address = (EditText) findViewById(R.id.searchLocation);
@@ -172,17 +164,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     public void getWorker(final String[] picked){
 
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/getworker", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.159/HandyMan/user.php/getworker", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try{
                     JSONArray jsonArr = new JSONArray(s);
-                    boolean authorized = true;
-                    if(authorized){
-                        session.setLogin(true);
-                        String username = jsonArr.getString(0);
-                        Log.e("JSONResult:",jsonArr.toString());
-                    }
+                    Log.d("JSONResult:",jsonArr.toString());
+
                 }catch (JSONException e){
                     Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
                 }
@@ -195,11 +183,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }){
             @Override
             protected Map<String,String> getParams(){
-                List<String> arr = new ArrayList<>(Arrays.asList(picked));
-                JSONArray pickedCategories = new JSONArray(arr);
+                List<String> pickedCategories = new ArrayList<>(Arrays.asList(picked));
                 Map<String,String> map = new HashMap<>();
-                map.put("categories",pickedCategories.toString());
+                map.put("category1",pickedCategories.get(0));
+                map.put("category2",pickedCategories.get(1));
                 return map;
+                //jalan indofaria barat 1 blok d capling 1
             }
         };
         AppController.getInstance().addToRequestQueue(request);
