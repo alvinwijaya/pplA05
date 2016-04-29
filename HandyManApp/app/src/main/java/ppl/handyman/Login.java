@@ -105,7 +105,7 @@ public class Login extends AppCompatActivity {
         pDialog.setMessage("Logging in ...");
         showDialog();
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/index.php/login", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.1.108/HandyMan/index.php/login", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Log.d(Login.class.getSimpleName(), "Login Response: " + s.toString());
