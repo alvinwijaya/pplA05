@@ -6,6 +6,9 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -77,15 +80,28 @@ public class registerHandler extends HttpServlet {
             throws ServletException, IOException {
         
         try {
+            
             Class.forName("com.mysql.jdbc.Driver");
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/handyman", "root", "");
             Statement statement = connection.createStatement();
             
             String username = request.getParameter("username");
+            
+            ResultSet resultset = statement.executeQuery("select * from user where username = '" + username + "'");
+            
+            if(resultset != null){
+                response.sendRedirect("register.jsp?username=exist");
+            }
+            
             String password = request.getParameter("password");
             String name = request.getParameter("name");
             String address = request.getParameter("address");
             String tag = request.getParameter("tag");
+            
+            MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+            crypt.reset();
+            crypt.update(password.getBytes("UTF-8"));
+            password = new BigInteger(1, crypt.digest()).toString(16);
 
             statement.executeUpdate("insert into worker (username, password, name, address, tag) values ('" + username + "','" + password + "','" + name + "','" + address + "','" + tag + "')");
 
@@ -94,6 +110,8 @@ public class registerHandler extends HttpServlet {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(loginHandler.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
+            Logger.getLogger(registerHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(registerHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         
