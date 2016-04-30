@@ -18,6 +18,7 @@ import java.util.*;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -37,18 +38,10 @@ public class registerHandler extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet registerHandler</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet registerHandler at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        HttpSession session = request.getSession(false);
+        
+        if(session == null || !session.getAttribute("logged").toString().equals("true")){
+            response.sendRedirect("index.html");
         }
     }
 
@@ -87,25 +80,37 @@ public class registerHandler extends HttpServlet {
             
             String username = request.getParameter("username");
             
-            ResultSet resultset = statement.executeQuery("select * from user where username = '" + username + "'");
+            ResultSet resultset = statement.executeQuery("select * from worker where username = '" + username + "'");
             
-            if(resultset != null){
-                response.sendRedirect("register.jsp?username=exist");
+            if(resultset.next()){
+                HttpSession session = request.getSession(false);
+                session.setAttribute("exist", "Username already exist");
+                response.sendRedirect("register");
+            }else{
+            
+                String password = request.getParameter("password");
+                String name = request.getParameter("name");
+                String address = request.getParameter("address");
+                String tag = request.getParameter("tag");
+                String photo = request.getParameter("photo");
+                Double latitude = 0.0;
+                Double longitude = 0.0;
+                if(!request.getParameter("latitude").isEmpty()){
+                    latitude = Double.parseDouble(request.getParameter("latitude"));
+                }
+                if(!request.getParameter("longitude").isEmpty()){
+                    longitude = Double.parseDouble(request.getParameter("longitude"));
+                }
+
+                MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+                crypt.reset();
+                crypt.update(password.getBytes("UTF-8"));
+                password = new BigInteger(1, crypt.digest()).toString(16);
+
+                statement.executeUpdate("insert into worker (username, password, name, address, tag, photo, latitude, longitude) values ('" + username + "','" + password + "','" + name + "','" + address + "','" + tag + "','" + photo + "', " + latitude + ", "  + longitude + ")");
+
+                response.sendRedirect("register");
             }
-            
-            String password = request.getParameter("password");
-            String name = request.getParameter("name");
-            String address = request.getParameter("address");
-            String tag = request.getParameter("tag");
-            
-            MessageDigest crypt = MessageDigest.getInstance("SHA-1");
-            crypt.reset();
-            crypt.update(password.getBytes("UTF-8"));
-            password = new BigInteger(1, crypt.digest()).toString(16);
-
-            statement.executeUpdate("insert into worker (username, password, name, address, tag) values ('" + username + "','" + password + "','" + name + "','" + address + "','" + tag + "')");
-
-            response.sendRedirect("register.jsp");
             
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(loginHandler.class.getName()).log(Level.SEVERE, null, ex);

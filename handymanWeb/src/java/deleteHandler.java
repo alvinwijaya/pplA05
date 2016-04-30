@@ -6,6 +6,13 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,8 +24,8 @@ import javax.servlet.http.HttpSession;
  *
  * @author alvin
  */
-@WebServlet(urlPatterns = {"/register"})
-public class register extends HttpServlet {
+@WebServlet(urlPatterns = {"/deleteHandler"})
+public class deleteHandler extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,42 +41,7 @@ public class register extends HttpServlet {
         HttpSession session = request.getSession(false);
         
         if(session != null && session.getAttribute("logged").toString().equals("true")){
-            response.setContentType("text/html;charset=UTF-8");
-            PrintWriter out = response.getWriter();
-
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Register</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("Register Worker<br>");
-            out.println("<form action=\"registerHandler\" method=\"post\">");
-            out.println("Username : <input type=\"text\" name=\"username\" required/>");
-            if (session.getAttribute("exist") != null){
-                out.println(session.getAttribute("exist"));
-                session.removeAttribute("exist");
-            }
-            out.println("<br>");
-            out.println("Password : <input type=\"password\" name=\"password\" required/><br>");
-            out.println("Name : <input type=\"text\" name=\"name\" required/><br>");
-            out.println("Address : <input type=\"text\" name=\"address\" required/><br>");
-            out.println("Tag : <input type=\"text\" name=\"tag\" required/><br>");
-            out.println("Photo link : <input type=\"text\" name=\"photo\"/><br>");
-            out.println("Latitude : <input type=\"text\" name=\"latitude\"/><br>");
-            out.println("Longitude : <input type=\"text\" name=\"longitude\"/><br>");
-            out.println("<input type=\"submit\"/><br>");
-            out.println("</form><br><br>");
-            out.println("<form action=\"logoutHandler\" method=\"post\">");
-            out.println("<input type=\"submit\" value=\"Logout\"/><br>");
-            out.println("</form><br><br>");
-            out.println("<form action=\"listWorker\" method=\"post\">");
-            out.println("<input type=\"submit\" value=\"View Worker\"/><br>");
-            out.println("</form><br>");
-            out.println("</body>");
-            out.println("</html>");
-            out.close();
-            
+            response.sendRedirect("listWorker");
         }else{
             response.sendRedirect("index.html");
         }
@@ -101,9 +73,23 @@ public class register extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        processRequest(request, response);
-        
+        try {
+            
+            Class.forName("com.mysql.jdbc.Driver");
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/handyman", "root", "");
+            Statement statement = connection.createStatement();
+            
+            String username = request.getParameter("username");
+            
+            statement.executeUpdate("delete from worker where username = '" + username + "'");
+            
+            response.sendRedirect("listWorker");
+            
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(loginHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(registerHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
