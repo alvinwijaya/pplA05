@@ -1,19 +1,30 @@
 package ppl.handyman;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
+import android.widget.Scroller;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -36,8 +47,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +66,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private SessionHandler session;
     private SQLiteHandler sqlhandler;
     private ArrayList<JSONObject> filtered;
+    private Button orderBtn;
+    private EditText detailWork;
     private final double DISTANCE_TO_WORKER = 5000;
     private double latitude;
     private double longitude;
@@ -65,7 +81,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         sqlhandler = new SQLiteHandler(getApplicationContext());
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
         filtered = new ArrayList<>();
-
+        orderBtn = (Button) findViewById(R.id.order);
+        detailWork = (EditText) findViewById(R.id.detailWork);
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
             alertLocation.setMessage("Let Google help apps to determine location. This means sending anonymous location data to Google.").setTitle("Use Location?");
@@ -100,11 +117,16 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         .build();
             }
         }
-
+        currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
+        setUpMapIfNeeded();
         String[] picked = session.getPickedCategory();
         getWorker(picked);
-        setUpMapIfNeeded();
+        putMarker();
         address = (EditText) findViewById(R.id.searchLocation);
+        address.setScroller(new Scroller(getApplicationContext()));
+        address.setMaxLines(1);
+        address.setHorizontalScrollBarEnabled(true);
+        address.setMovementMethod(new ScrollingMovementMethod());
         /*
         Text watcher is a listener for text when text value changed
          */
@@ -127,16 +149,32 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     Geocoder geocoder = new Geocoder(getApplicationContext());
                     List<Address> addresses = geocoder.getFromLocationName(address_value, 1);
                     if (addresses.size() > 0) {
-                        double lat = addresses.get(0).getLatitude();
-                        double lgn = addresses.get(0).getLongitude();
-                        mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Location"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
+                        final double lat = addresses.get(0).getLatitude();
+                        final double lgn = addresses.get(0).getLongitude();
+                        if(currentLoc != null) {
+                            currentLoc.setLatitude(lat);
+                            currentLoc.setLongitude(lgn);
+                            latitude = currentLoc.getLatitude();
+                            longitude = currentLoc.getLongitude();
+                        }
+                        String[] picked = session.getPickedCategory();
+                        getWorker(picked);
+                        //delay put marker 1s to make sure request respond is processed properly
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                putMarkerWithoutCurrentLocation();
+                                mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Your Location"));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
+                            }
+                        }, 1000);
+
                     } else {
                         //this location supposed to be your current location (still hardcoded)
-                        mMap.clear();
+                        putMarkerWithoutCurrentLocation();
                         mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
+
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -144,6 +182,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             }
         };
         address.addTextChangedListener(watcher);
+        orderBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                putOrder(filtered);
+            }
+        });
 
     }
 
@@ -164,12 +208,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
         return true;
     }
+
     public void putMarker(){
         mMap.clear();
         setUpMap();
         for(JSONObject json: this.filtered){
             try {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + "Location"));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -180,12 +225,67 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         mMap.clear();
         for(JSONObject json: this.filtered){
             try {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + "Location"));
+                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
+                Log.d("Marker", "Marker was added");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
+
+    public void putOrder(final ArrayList<JSONObject> workers){
+        Log.d("Order","Order is being sent");
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/putorder", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String s) {
+                    Log.d("Put Result:",s);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Toast.makeText(getApplicationContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+            }
+        }){
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> map = new HashMap<>();
+                JSONArray jsonArr = new JSONArray();
+                for (JSONObject json: workers){
+                    jsonArr.put(json);
+                }
+                Map<String,String> userDetails = sqlhandler.getUserDetails();
+                DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date date = new Date();
+                String category = "";
+                String[] picked = session.getPickedCategory();
+                category = category+picked[0]+",";
+                if(picked.length > 1){
+                    category+= picked[1];
+                }else {
+                    category = "";
+                    category = category+picked[0];
+                }
+                Log.d("ARRAY", jsonArr.toString());
+                map.put("workers", String.valueOf(jsonArr));
+                map.put("username", userDetails.get("username"));
+                map.put("date", dateFormat.format(date));
+                map.put("category",category);
+                map.put("rating","0");
+                map.put("review","");
+                map.put("details",detailWork.getText().toString());
+                if(address.getText().equals("")){
+                    map.put("address",userDetails.get("address"));
+                }else{
+                    map.put("address",address.getText().toString());
+                }
+                map.put("latitude",""+latitude);
+                map.put("longitude",""+longitude);
+                return map;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(request);
+    }
+
     public void getWorker(final String[] picked){
 
 
@@ -194,7 +294,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             public void onResponse(String s) {
                 try{
                     JSONArray jsonArr = new JSONArray(s);
-                    filtered = new ArrayList<>();
+                    filtered.clear();
                     Log.d("JSONResult:",jsonArr.toString());
                     if (currentLoc!=null){
                         for(int ii =0; ii < jsonArr.length();ii++){
@@ -209,7 +309,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                                 filtered.add(json);
                             }
                         }
-                        putMarker();
+                    }else {
+                        Log.d("","Current loc null");
                     }
                 }catch (JSONException e){
                     Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
@@ -226,8 +327,10 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 List<String> pickedCategories = new ArrayList<>(Arrays.asList(picked));
                 Map<String,String> map = new HashMap<>();
                 map.put("category1",pickedCategories.get(0));
+                Log.d("category1",pickedCategories.get(0));
                 if(pickedCategories.size() > 1){
                     map.put("category2",pickedCategories.get(1));
+                    Log.d("category2",pickedCategories.get(1));
                 }
 
                 return map;
@@ -245,7 +348,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     protected void onStop() {
         super.onStop();
-        mClient.disconnect();
 
     }
 
@@ -281,23 +383,47 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+            mMap = ((MapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            final ScrollView scrollView = (ScrollView) findViewById(R.id.scroll);
+            ((MapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).setListener(new MapFragment.OnTouchListener(){
+                @Override
+                public void onTouch() {
+                    scrollView.requestDisallowInterceptTouchEvent(true);
+                }
+            });
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
+
                 setUpMap();
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
-                    public void onMapClick(LatLng latLng) {
-                        mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+                    public void onMapClick(final LatLng latLng) {
+                        if(currentLoc != null) {
+                            currentLoc.setLatitude(latLng.latitude);
+                            currentLoc.setLongitude(latLng.longitude);
+                            latitude = currentLoc.getLatitude();
+                            longitude = currentLoc.getLongitude();
+                        }
                         String[] picked = session.getPickedCategory();
                         getWorker(picked);
-                        putMarkerWithoutCurrentLocation();
+                        //delay put marker 1s to make sure request respond is processed properly
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            public void run() {
+                                putMarkerWithoutCurrentLocation();
+                                mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+                            }
+                        }, 1000);
+
+
                     }
                 });
+            }else{
+                putMarker();
             }
+
         }
     }
 
@@ -319,10 +445,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         if(currentLoc != null){
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
-            Log.d("Location: ",latitude+" "+longitude);
+            Log.d("Location: ",latitude+" " + longitude);
             mMap.clear();
             setUpMap();
-            Toast.makeText(getApplicationContext(),latitude+" "+longitude,Toast.LENGTH_LONG).show();
 
         }
     }

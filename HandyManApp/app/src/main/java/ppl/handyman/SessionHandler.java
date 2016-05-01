@@ -19,7 +19,7 @@ public class SessionHandler {
 
     Editor editor;
     Context _context;
-
+    SQLiteHandler sql;
     // Shared pref mode
     int PRIVATE_MODE = 0;
 
@@ -33,7 +33,14 @@ public class SessionHandler {
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
     }
+    public void setUsername(String username){
+        editor.putString("username",username);
 
+        // commit changes
+        editor.commit();
+
+        Log.d(TAG, "User login session modified!");
+    }
     public void setLogin(boolean isLoggedIn) {
 
         editor.putBoolean(KEY_IS_LOGGED_IN, isLoggedIn);
@@ -53,7 +60,6 @@ public class SessionHandler {
         editor.putStringSet("Picked Category",pickedCategory);
         editor.commit();
     }
-
     public  String[] getPickedCategory(){
         TreeSet<String> set = new TreeSet<>();
         return  pref.getStringSet("Picked Category",set).toArray(new String[set.size()]);

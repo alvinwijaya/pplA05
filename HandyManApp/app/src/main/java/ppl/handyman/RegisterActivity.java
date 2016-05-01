@@ -107,7 +107,7 @@ public class RegisterActivity extends Activity {
         pDialog.setMessage("Registering ...");
         showDialog();
 
-        final StringRequest request = new StringRequest(Request.Method.POST,"http://192.168.1.108/HandyMan/index.php/register", new Response.Listener<String>() {
+        final StringRequest request = new StringRequest(Request.Method.POST,"http://192.168.43.229/HandyMan/index.php/register", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(RegisterActivity.class.getSimpleName(), "Register Response: " + response.toString());

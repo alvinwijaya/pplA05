@@ -72,7 +72,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         long id = db.insert(TABLE_USER, "lattitude,longitude", values);
         db.close(); // Closing database connection
 
-        Log.d(TAG, "New user inserted into sqlite: " + id);
+        Log.d(TAG, "New user inserted into sqlite: " + username);
     }
 
     /**
@@ -87,7 +87,8 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         // Move to first row
         cursor.moveToFirst();
         if (cursor.getCount() > 0) {
-            user.put("username", cursor.getString(1));
+            user.put("username", cursor.getString(0));
+            Log.d(TAG, cursor.getString(0));
             user.put("name", cursor.getString(2));
             user.put("phone", cursor.getString(3));
             user.put("address", cursor.getString(4));

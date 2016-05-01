@@ -105,7 +105,7 @@ public class Login extends AppCompatActivity {
         pDialog.setMessage("Logging in ...");
         showDialog();
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.1.108/HandyMan/index.php/login", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/index.php/login", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Log.d(Login.class.getSimpleName(), "Login Response: " + s.toString());
@@ -120,6 +120,7 @@ public class Login extends AppCompatActivity {
                         String name = json.getString("name");
                         String phone = json.getString("phone");
                         String address = json.getString("address");
+                        Log.d("username",username);
                         sqlhandler.addUser(username,name,phone,address);
                         Intent in = new Intent(Login.this,DashboardActivity.class);
                         startActivity(in);
@@ -156,5 +157,11 @@ public class Login extends AppCompatActivity {
     private void hideDialog() {
         if (pDialog.isShowing())
             pDialog.dismiss();
+    }
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(getApplicationContext(), Login.class);
+        startActivity(i);
+        finish();
     }
 }
