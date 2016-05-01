@@ -1,4 +1,4 @@
-package nathanojahan.gridview;
+package ppl.handyman;
 
 import android.content.Context;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import nathanojahan.gridview.R;
+import ppl.handyman.R;
 
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
