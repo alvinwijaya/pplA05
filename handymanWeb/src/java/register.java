@@ -65,7 +65,7 @@ public class register extends HttpServlet {
             out.println("<div class=\"row\">");
             out.println("<form action=\"registerHandler\" method=\"post\">");
             out.println("<div class=\"input-field col s6\">");
-            out.println("<input type=\"text\" name=\"username\" class=\"validate\" required/>");
+            out.println("<input type=\"email\" name=\"username\" class=\"validate\" required/>");
             if (session.getAttribute("exist") != null){
                 out.println("<label for=\"username\">" + session.getAttribute("exist") + "</label>");
                 session.removeAttribute("exist");

@@ -125,7 +125,7 @@
                         out.println("<div class=\"row\">");
                         out.println("<form action=\"editHandler\" method=\"post\">");
                         out.println("<div class=\"input-field col s6\">");
-                        out.println("<input type=\"text\" name=\"username\" value=\"" + resultset.getObject(1) + "\" readonly/>");
+                        out.println("<input type=\"email\" name=\"username\" value=\"" + resultset.getObject(1) + "\" readonly/>");
                         out.println("<label for=\"username\">Username</label>");
                         out.println("</div>");
                         out.println("<div class=\"input-field col s6\">");
