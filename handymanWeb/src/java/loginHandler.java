@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.security.*;
 import java.math.*;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -36,18 +37,10 @@ public class loginHandler extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet loginHandler</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet loginHandler at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+        HttpSession session = request.getSession(false);
+        
+        if(session == null || !session.getAttribute("logged").toString().equals("true")){
+            response.sendRedirect("index.html");
         }
     }
 
@@ -80,19 +73,23 @@ public class loginHandler extends HttpServlet {
         
         try {
             String username = request.getParameter("username");
-            if(username.equals("admin@admin.admin")){
+            if(username.equals("admin@gmail.com")){
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/handyman", "root", "");
                 Statement statement = connection.createStatement();
                 String pass = request.getParameter("password");
-                MessageDigest m = MessageDigest.getInstance("MD5");
-                m.update(pass.getBytes(), 0, pass.length());
-                BigInteger i = new BigInteger(1,m.digest());
-                pass = String.format("%1$032x", i);
-                ResultSet resultset = statement.executeQuery("select * from user where username = 'admin@admin.admin'");
+                
+                MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+                crypt.reset();
+                crypt.update(pass.getBytes("UTF-8"));
+
+                pass = new BigInteger(1, crypt.digest()).toString(16);
+                ResultSet resultset = statement.executeQuery("select * from user where username = 'admin@gmail.com'");
                 resultset.next();
                 if(pass.equals(resultset.getObject(2))){
-                    response.sendRedirect("register.jsp");
+                    HttpSession session = request.getSession(true);
+                    session.setAttribute("logged", "true");
+                    response.sendRedirect("register");
                 }else{
                     response.sendRedirect("index.html");
                 }
