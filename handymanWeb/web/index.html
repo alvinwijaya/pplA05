@@ -8,15 +8,49 @@ and open the template in the editor.
     <head>
         <title>Authentification</title>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link type="text/css" rel="stylesheet" href="css/style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
-    <body>
-        Login<br><br>
-        
-        <form action="loginHandler" method="post">
-            Username : <input type="text" name="username" required/><br>
-            Password : <input type="password" name="password" required/><br>
-            <input type="submit"/>
-        </form>
+    <body>        
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src="js/materialize.min.js"></script>
+      <script type="text/javascript">
+      //custom JS code
+      </script>
+
+      <div class="intro blue z-depth-2">
+        <h2 class="white-text text-darken-1">HandyMan Hand</h2>
+      </div>
+
+      <div class="container white">
+        <ul class="collapsible white" data-collpasible="accordion">
+          <li>
+            <div class="collapsible-header">
+              <h3 class="blue-text text-lighten-1 center">Admin Login</h3>
+            </div>
+            <div class="collapsible-body">
+              <div class="container">
+                <div class="row">
+                  <form action="loginHandler" method="post">
+                    <div class="input-field col s6">
+                      <input id="username" input type="text" name="username" required/><br>
+                      <label for="username">Username</label>
+                    </div>
+                    <div class="input-field col s6">
+                      <input id="password" input type="password" name="password" required/><br>
+                      <label for="username">Password</label>
+                    </div>
+                    <button class="btn waves-effect waves-light" type="submit" name="action">
+                      Login
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          <li>
+        </ul>
+      </div>
     </body>
 </html>
