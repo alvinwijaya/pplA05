@@ -82,7 +82,6 @@ function login(){
 					'status' => true,
 					'address' => $fetch->address,
 					'username' => $fetch->username,
-					'password' => $fetch->password,
 					'name'=> $fetch->name,
 					'phone'=> $fetch->phone
 			);

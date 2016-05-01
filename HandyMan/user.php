@@ -37,6 +37,7 @@ $app->get('/', function () {
 
 // POST route .method name
 $app->post('/getworker','getWorkerByCategories');
+$app->post('/putorder','putOrder');
 
 // PUT route
 $app->put('/put',function() {
@@ -56,6 +57,40 @@ $app->delete(
     }
 );
 
+function putOrder(){
+	$app = \Slim\Slim::getInstance();
+	$error = false;
+	
+		$db = connectDB();
+		$userDetails = $app->request->post('user');
+		$jsonUser = json_encode($userDetails);
+		$username = $app->request->post('username');
+		$category = $app->request->post('category');
+		$date = $app->request->post('date');
+		$rating = $app->request->post("rating");
+		$review = $app->request->post("review");
+		$details = $app->request->post("details");
+		$address = $app->request->post("address");
+		$latittude = $app->request->post("latitude");
+		$longitude = $app->request->post("longitude");
+		
+		$sql = "insert into user_order (user_username, date, category,rating,review,details,address,latittude,longitude) values ('$username','$date','$category','$rating','$review','$details','$address','$latittude','$longitude')";
+		$result = $db->query($sql);
+
+		$order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
+		$result= $db->query($order_id_sql);
+		$order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
+		$order_id = $order_id_fetch->id;
+
+		$workers = $app->request->post('workers');
+		$arrJson  = json_decode($workers);
+		foreach ($arrJson as $key => $value) {
+			$worker_username = $value->username;
+			$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
+			$put_worker_order = $db->query($worker_order_sql);
+		}
+	} 
+
 function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
@@ -65,6 +100,10 @@ function getWorkerByCategories(){
 	try{
 		$db = connectDB();
 		$sql = "select * from worker where tag LIKE '%$category1%' OR tag LIKE '%$category2%'";
+		if (!$category2) {
+			$sql = "select * from worker where tag LIKE '%$category1%'";
+		}
+		
 		$result = $db->query($sql);
 		$fetch = $result->fetchAll(PDO::FETCH_ASSOC);
 		if(empty($fetch)){
@@ -76,6 +115,7 @@ function getWorkerByCategories(){
 					$res,
 					array(
 						'error' => false,
+						'username' => $row['username'],
 						'address' => $row['address'],
 						'tag' => $row['tag'],
 						'rating' => $row['rating'],
