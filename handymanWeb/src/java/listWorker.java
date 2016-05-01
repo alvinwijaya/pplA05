@@ -49,9 +49,20 @@ public class listWorker extends HttpServlet {
                 out.println("<!DOCTYPE html>");
                 out.println("<html>");
                 out.println("<head>");
-                out.println("<title>List Worker</title>");            
+                out.println("<title>List Worker</title>");
+                out.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>");
+                out.println("<link type=\"text/css\" rel=\"stylesheet\" href=\"css/materialize.min.css\"  media=\"screen,projection\"/>");
+                out.println("<link type=\"text/css\" rel=\"stylesheet\" href=\"css/materialize.min.css\"  media=\"screen,projection\"/>");
+                out.println("<link type=\"text/css\" rel=\"stylesheet\" href=\"css/style.css\">");
+                out.println("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">");
                 out.println("</head>");
                 out.println("<body>");
+                out.println("<script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-2.1.1.min.js\"></script>");
+                out.println("<script type=\"text/javascript\" src=\"js/materialize.min.js\"></script>");
+                out.println("<script type=\"text/javascript\"></script>");
+                out.println("<div class=\"intro blue z-depth-2\">");
+                out.println("<h2 class=\"white-text text-darken-1\">Handyman Hand</h2>");
+                out.println("</div>");
                 
                 Class.forName("com.mysql.jdbc.Driver");
                 Connection connection = DriverManager.getConnection("jdbc:mysql://localhost/handyman", "root", "");
@@ -61,45 +72,58 @@ public class listWorker extends HttpServlet {
                 ResultSetMetaData metaData = resultset.getMetaData();
                 
                 int numCol = metaData.getColumnCount();
-                out.println("<table>");
+                out.println("<div class=\"container\">");
+                out.println("<table class=\"bordered\">");
+                out.println("<thead>");
                 out.println("<tr>");
                 for(int i = 1; i <= numCol; i++){
-                    out.println("<td>");
-                    out.println(metaData.getColumnName(i));
-                    out.println("</td>");
+                    out.println("<th class=\"white-text text-darken-1\">");
+                    out.println("Username");
+                    out.println("</th>");
                 }
-                out.println("<td>");
-                out.println("edit");
-                out.println("</td>");
-                out.println("<td>");
-                out.println("delete");
-                out.println("</td>");
+                out.println("</div>");
+                out.println("<th class=\"white-text text-darken-1\">");
+                out.println("Edit");
+                out.println("</th>");
+                out.println("<th class=\"white-text text-darken-1\">");
+                out.println("Delete");
+                out.println("</th>");
                 out.println("</tr>");
+                out.println("</div>");
+                out.println("</thead>");
+                out.println("<tbody>");
                 while(resultset.next()){
                     out.println("<tr>");
                     for(int i = 1; i <= numCol; i++){
-                        out.println("<td>");
-                        out.println(resultset.getObject(i));
-                        out.println("</td>");
-                        out.println("<td>");
-                        out.println("<form action=\"edit\" method=\"post\">");
-                        out.println("<input type=\"hidden\" name=\"username\" value=\"" + resultset.getObject(i) + "\"/><br>");
-                        out.println("<input type=\"submit\" value=\"Edit\"/><br>");
-                        out.println("</form>");
-                        out.println("</td>");
-                        out.println("<td>");
-                        out.println("<form action=\"deleteHandler\" method=\"post\">");
-                        out.println("<input type=\"hidden\" name=\"username\" value=\"" + resultset.getObject(i) + "\"/><br>");
-                        out.println("<input type=\"submit\" value=\"Delete\"/><br>");
-                        out.println("</form>");
-                        out.println("</td>");
+                        if(!resultset.getObject(i).toString().equals("admin@gmail.com")){
+                            out.println("<td class=\"white-text text-darken-1\">");
+                            out.println(resultset.getObject(i));
+                            out.println("</td>");
+                            out.println("<td>");
+                            out.println("<form action=\"edit\" method=\"post\">");
+                            out.println("<input type=\"hidden\" name=\"username\" value=\"" + resultset.getObject(i) + "\"/><br>");
+                            out.println("<button class=\"btn waves-effect waves-light\" type=\"submit\" name=\"action\">edit</button>");
+                            out.println("</form>");
+                            out.println("</td>");
+                            out.println("<td>");
+                            out.println("<form action=\"deleteHandler\" method=\"post\">");
+                            out.println("<input type=\"hidden\" name=\"username\" value=\"" + resultset.getObject(i) + "\"/><br>");
+                            out.println("<button class=\"btn waves-effect waves-light\" type=\"submit\" name=\"action\">delete</button>");
+                            out.println("</form>");
+                            out.println("</td>");
+                        }
                     }
                     out.println("</tr>");
                 }
-                out.println("</table>");
+                out.println("</tbody>");
+                out.println("</table><br>");
+                out.println("<form action=\"register\" method=\"post\">");
+                out.println("<button class=\"btn waves-effect waves-light\" type=\"submit\" name=\"action\">Register Tukang</button>");
+                out.println("</form><br>");
                 out.println("<form action=\"logoutHandler\" method=\"post\">");
-                out.println("<input type=\"submit\" value=\"Logout\"/><br>");
-                out.println("</form><br><br>");
+                out.println("<button class=\"btn waves-effect waves-light\" type=\"submit\" name=\"action\">Logout</button>");
+                out.println("</form><br>");
+                out.println("</div>");
                 out.println("</body>");
                 out.println("</html>");
             }
