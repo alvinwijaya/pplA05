@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -21,16 +23,8 @@ import java.util.zip.Inflater;
  */
 public class SearchFragment extends Fragment {
     SQLiteHandler sql;
-    private ImageView ac;
-    private ImageView air;
-    private ImageView bengkel;
-    private ImageView besi;
-    private ImageView cat;
-    private ImageView kayu;
-    private ImageView listrik;
-    private ImageView taman;
-    private ImageView tembok;
     private Button search;
+    private GridView gridview;
     private TreeSet<String> pickedCategory;
     private SessionHandler session;
 
@@ -53,19 +47,271 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-        ac = (ImageView) view.findViewById(R.id.ac);
-        air = (ImageView) view.findViewById(R.id.air);
-        bengkel = (ImageView) view.findViewById(R.id.bengkel);
-        besi = (ImageView) view.findViewById(R.id.besi);
-        cat = (ImageView) view.findViewById(R.id.cat);
-        kayu = (ImageView) view.findViewById(R.id.kayu);
-        listrik = (ImageView) view.findViewById(R.id.listrik);
-        taman = (ImageView) view.findViewById(R.id.taman);
-        tembok = (ImageView) view.findViewById(R.id.tembok);
-        search = (Button) view.findViewById(R.id.button);
+        View view = inflater.inflate(R.layout.fragment_newsearch, container, false);
+        search = (Button) view.findViewById(R.id.buttonNextOrder);
+        gridview = (GridView) view.findViewById(R.id.gridview);
+        gridview.setAdapter(new ImageAdapter(view.getContext()));
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            boolean[] flag= new boolean[9];
+            @Override
+            public void onItemClick(AdapterView<?> parent, View imgView, int position, long id) {
 
+                    if (position == 0) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.ac_checked);
+                                flag[position] = true;
+                                pickedCategory.add("ac");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
 
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.ac);
+                            flag[position] = false;
+                            pickedCategory.remove("ac");
+                        }
+                    } else if (position == 1) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.air_checked);
+                                flag[position] = true;
+                                pickedCategory.add("air");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.air);
+                            flag[position] = false;
+                            pickedCategory.remove("air");
+                        }
+                    } else if (position == 2) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.bengkel_checked);
+                                flag[position] = true;
+                                pickedCategory.add("bengkel");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.bengkel);
+                            flag[position] = false;
+                            pickedCategory.remove("bengkel");
+                        }
+                    } else if (position == 3) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.besi_checked);
+                                flag[position] = true;
+                                pickedCategory.add("besi");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.besi);
+                            flag[position] = false;
+                            pickedCategory.remove("besi");
+                        }
+                    } else if (position == 4) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.cat_checked);
+                                flag[position] = true;
+                                pickedCategory.add("cat");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.cat);
+                            flag[position] = false;
+                            pickedCategory.remove("cat");
+                        }
+                    } else if (position == 5) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.kayu_checked);
+                                flag[position] = true;
+                                pickedCategory.add("kayu");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.kayu);
+                            flag[position] = false;
+                            pickedCategory.remove("kayu");
+                        }
+                    } else if (position == 6) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.listrik_checked);
+                                flag[position] = true;
+                                pickedCategory.add("listrik");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.listrik);
+                            flag[position] = false;
+                            pickedCategory.remove("listrik");
+                        }
+                    } else if (position == 7) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.taman_checked);
+                                flag[position] = true;
+                                pickedCategory.add("taman");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.taman);
+                            flag[position] = false;
+                            pickedCategory.remove("taman");
+                        }
+                    } else if (position == 8) {
+                        if (!flag[position]) {
+                            if(pickedCategory.size() < 2) {
+                                ImageView imageView = (ImageView) imgView;
+                                imageView.setImageResource(R.drawable.tembok_checked);
+                                flag[position] = true;
+                                pickedCategory.add("tembok");
+                            } else {
+                                Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+                            }
+                        } else {
+                            ImageView imageView = (ImageView) imgView;
+                            imageView.setImageResource(R.drawable.tembok);
+                            flag[position] = false;
+                            pickedCategory.remove("tembok");
+                        }
+                    }
+
+                }
+        });
+//        ac.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(pickedCategory.size() < 2){
+//                    pickedCategory.add("ac");
+//                }else{
+//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
+//        air.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(pickedCategory.size() < 2){
+//                    pickedCategory.add("air");
+//                }
+//                else{
+//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
+//        bengkel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(pickedCategory.size() < 2){
+//                    pickedCategory.add("bengkel");
+//                }
+//                else{
+//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
+//        besi.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(pickedCategory.size() < 2){
+//                    pickedCategory.add("besi");
+//
+//                }
+//                else{
+//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
+//        cat.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(pickedCategory.size() < 2){
+//                    pickedCategory.add("cat");
+//
+//                }
+//                else{
+//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
+//        kayu.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (pickedCategory.size() < 2) {
+//                    pickedCategory.add("kayu");
+//
+//                } else {
+//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
+//        listrik.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                if(pickedCategory.size() < 2){
+//                    pickedCategory.add("listrik");
+//
+//                }
+//                else{
+//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
+//        taman.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (pickedCategory.size() < 2) {
+//                    pickedCategory.add("taman");
+//                } else {
+//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
+//        tembok.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (pickedCategory.size() < 2) {
+//                    pickedCategory.add("tembok");
+//
+//                } else {
+//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
+//                }
+//            }
+//        });
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,120 +319,12 @@ public class SearchFragment extends Fragment {
                 if(pickedCategory.size()==0){
                     Toast.makeText(getActivity(),"You must choose at least 1 category",Toast.LENGTH_LONG).show();
                 }else{
-                session.setPickedCategory(pickedCategory);
-                Intent intent = new Intent(getContext(),OrderActivity.class);
-                startActivity(intent);
+                    session.setPickedCategory(pickedCategory);
+                    Intent intent = new Intent(getContext(),OrderActivity.class);
+                    startActivity(intent);
                 }
             }
         });
-        ac.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(pickedCategory.size() < 2){
-                    pickedCategory.add("ac");
-                }else{
-                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        air.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(pickedCategory.size() < 2){
-                    pickedCategory.add("air");
-                }
-                else{
-                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        bengkel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(pickedCategory.size() < 2){
-                    pickedCategory.add("bengkel");
-                }
-                else{
-                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        besi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(pickedCategory.size() < 2){
-                    pickedCategory.add("besi");
-
-                }
-                else{
-                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        cat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(pickedCategory.size() < 2){
-                    pickedCategory.add("cat");
-
-                }
-                else{
-                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        kayu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pickedCategory.size() < 2) {
-                    pickedCategory.add("kayu");
-
-                } else {
-                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        listrik.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                if(pickedCategory.size() < 2){
-                    pickedCategory.add("listrik");
-
-                }
-                else{
-                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-        taman.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pickedCategory.size() < 2) {
-                    pickedCategory.add("taman");
-                } else {
-                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-                }
-
-            }
-        });
-        tembok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (pickedCategory.size() < 2) {
-                    pickedCategory.add("tembok");
-
-                } else {
-                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-
         return view;
     }
 }
