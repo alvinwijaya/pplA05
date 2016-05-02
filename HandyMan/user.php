@@ -66,6 +66,8 @@ function putOrder(){
 		$jsonUser = json_encode($userDetails);
 		$username = $app->request->post('username');
 		$category = $app->request->post('category');
+		$order_status = $app->request->post('order_status');
+		$total_worker = $app->request->post('total_worker');
 		$date = $app->request->post('date');
 		$rating = $app->request->post("rating");
 		$review = $app->request->post("review");
@@ -74,21 +76,21 @@ function putOrder(){
 		$latittude = $app->request->post("latitude");
 		$longitude = $app->request->post("longitude");
 		
-		$sql = "insert into user_order (user_username, date, category,rating,review,details,address,latittude,longitude) values ('$username','$date','$category','$rating','$review','$details','$address','$latittude','$longitude')";
+		$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
 		$result = $db->query($sql);
 
-		$order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
-		$result= $db->query($order_id_sql);
-		$order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
-		$order_id = $order_id_fetch->id;
+		// $order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
+		// $result= $db->query($order_id_sql);
+		// $order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
+		// $order_id = $order_id_fetch->id;
 
-		$workers = $app->request->post('workers');
-		$arrJson  = json_decode($workers);
-		foreach ($arrJson as $key => $value) {
-			$worker_username = $value->username;
-			$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
-			$put_worker_order = $db->query($worker_order_sql);
-		}
+		// $workers = $app->request->post('workers');
+		// $arrJson  = json_decode($workers);
+		// foreach ($arrJson as $key => $value) {
+		// 	$worker_username = $value->username;
+		// 	$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
+		// 	$put_worker_order = $db->query($worker_order_sql);
+		// }
 	} 
 
 function getWorkerByCategories(){
