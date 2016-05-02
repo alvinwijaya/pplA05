@@ -25,6 +25,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -68,6 +69,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private ArrayList<JSONObject> filtered;
     private Button orderBtn;
     private EditText detailWork;
+    private EditText totalWorker;
+    private TextView estimateCost;
+    private boolean firstTime = false;
     private final double DISTANCE_TO_WORKER = 5000;
     private double latitude;
     private double longitude;
@@ -83,6 +87,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         filtered = new ArrayList<>();
         orderBtn = (Button) findViewById(R.id.order);
         detailWork = (EditText) findViewById(R.id.detailWork);
+        totalWorker = (EditText) findViewById(R.id.numberWorker);
+        estimateCost = (TextView) findViewById(R.id.estimateCost);
+        if(estimateCost.getText().toString().equals("")){
+            estimateCost.setText(0+"");
+        }else{
+            estimateCost.setText(Integer.parseInt(estimateCost.getText().toString()) * 200000);
+        }
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
             alertLocation.setMessage("Let Google help apps to determine location. This means sending anonymous location data to Google.").setTitle("Use Location?");
@@ -119,9 +130,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
         currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
         setUpMapIfNeeded();
-        String[] picked = session.getPickedCategory();
-        getWorker(picked);
-        putMarker();
         address = (EditText) findViewById(R.id.searchLocation);
         address.setScroller(new Scroller(getApplicationContext()));
         address.setMaxLines(1);
@@ -215,6 +223,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         for(JSONObject json: this.filtered){
             try {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
+                Log.d("Marker", "Marker was added");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -273,6 +282,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 map.put("rating","0");
                 map.put("review","");
                 map.put("details",detailWork.getText().toString());
+                map.put("status",false+"");
+                map.put("totalWorker",totalWorker.getText().toString());
                 if(address.getText().equals("")){
                     map.put("address",userDetails.get("address"));
                 }else{
@@ -311,6 +322,10 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         }
                     }else {
                         Log.d("","Current loc null");
+                    }
+                    if(firstTime){
+                        firstTime = !firstTime;
+                        putMarker();
                     }
                 }catch (JSONException e){
                     Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
@@ -446,9 +461,15 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
             Log.d("Location: ",latitude+" " + longitude);
-            mMap.clear();
             setUpMap();
-
+            String[] picked = session.getPickedCategory();
+            getWorker(picked);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    putMarker();
+                }
+            }, 1000);
         }
     }
 

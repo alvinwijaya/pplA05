@@ -46,7 +46,10 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
+        /**
+         * TO DO:
+         * WE NEED TO REFACTOR THIS CODE!!!
+         */
         View view = inflater.inflate(R.layout.fragment_newsearch, container, false);
         search = (Button) view.findViewById(R.id.buttonNextOrder);
         gridview = (GridView) view.findViewById(R.id.gridview);
@@ -206,112 +209,7 @@ public class SearchFragment extends Fragment {
 
                 }
         });
-//        ac.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(pickedCategory.size() < 2){
-//                    pickedCategory.add("ac");
-//                }else{
-//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
-//        air.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(pickedCategory.size() < 2){
-//                    pickedCategory.add("air");
-//                }
-//                else{
-//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
-//        bengkel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(pickedCategory.size() < 2){
-//                    pickedCategory.add("bengkel");
-//                }
-//                else{
-//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
-//        besi.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(pickedCategory.size() < 2){
-//                    pickedCategory.add("besi");
-//
-//                }
-//                else{
-//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
-//        cat.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if(pickedCategory.size() < 2){
-//                    pickedCategory.add("cat");
-//
-//                }
-//                else{
-//                    Toast.makeText(getContext(),"You can only pick at most 2 different categories",Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
-//        kayu.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (pickedCategory.size() < 2) {
-//                    pickedCategory.add("kayu");
-//
-//                } else {
-//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
-//        listrik.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if(pickedCategory.size() < 2){
-//                    pickedCategory.add("listrik");
-//
-//                }
-//                else{
-//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
-//        taman.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (pickedCategory.size() < 2) {
-//                    pickedCategory.add("taman");
-//                } else {
-//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-//                }
-//
-//            }
-//        });
-//        tembok.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (pickedCategory.size() < 2) {
-//                    pickedCategory.add("tembok");
-//
-//                } else {
-//                    Toast.makeText(getContext(), "You can only pick at most 2 different categories", Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        });
+
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
