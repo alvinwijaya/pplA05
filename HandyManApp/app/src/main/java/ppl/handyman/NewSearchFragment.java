@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import java.util.TreeSet;
 import java.util.zip.Inflater;
@@ -39,6 +41,9 @@ public class NewSearchFragment extends Fragment {
         sql = new SQLiteHandler(getContext());
         session = new SessionHandler(getContext());
         pickedCategory = new TreeSet<>();
+		//bikin objek animasi
+		final Animation animScale = AnimationUtils.loadAnimation(this, R.anim.anim_scale);
+
 
     }
 
@@ -49,6 +54,8 @@ public class NewSearchFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_newsearch, container, false);
         search = (Button) view.findViewById(R.id.buttonNextOrder);
+		
+		
         gridview = (GridView) view.findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(view.getContext()));
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -280,6 +287,8 @@ public class NewSearchFragment extends Fragment {
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+				//Jalankan animasi scale
+				v.startAnimation(animScale);
                 //save data to a bundle so data wont be destroyed
                 if(pickedCategory.size()==0){
                     Toast.makeText(getActivity(),"You must choose at least 1 category",Toast.LENGTH_LONG).show();
