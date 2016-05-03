@@ -4,20 +4,20 @@ package ppla5.handymanworkerapp;
  * Created by Ari on 5/2/2016.
  */
 public class Order {
-    private String title,description;
+    private String name,description;
     public Order() {
     }
 
-    public Order(String title, String description) {
-        this.title = title;
+    public Order(String name, String description) {
+        this.name = name;
         this.description = description;
     }
-    public String getTitle() {
-        return title;
+    public String getName() {
+        return name;
     }
 
-    public void setTitle(String name) {
-        this.title = name;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {

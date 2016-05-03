@@ -15,11 +15,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.MyViewHolder
     private List<Order> ordersList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, description;
+        public TextView name, description;
 
         public MyViewHolder(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.title);
+            name = (TextView) view.findViewById(R.id.name);
             description = (TextView) view.findViewById(R.id.description);
         }
     }
@@ -36,7 +36,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.MyViewHolder
     @Override
     public void onBindViewHolder(OrderAdapter.MyViewHolder holder, int position) {
         Order order = ordersList.get(position);
-        holder.title.setText(order.getTitle());
+        holder.name.setText(order.getName());
         holder.description.setText(order.getDescription());
     }
 
