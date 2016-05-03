@@ -1,6 +1,7 @@
 package ppl.handyman;
 
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,12 @@ public class SplashActivity extends AppCompatActivity {
 
     // Splash screen timer
     private static int SPLASH_TIME_OUT = 4000;
-
+    private SessionHandler session;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        session = new SessionHandler(getApplicationContext());
         setContentView(R.layout.activity_splash);
-
         new Handler().postDelayed(new Runnable() {
 
             /*

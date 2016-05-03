@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ppl.handyman">
+    package="ppl.handyman" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,11 +18,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_handyman"
         android:label="@string/app_name"
-        android:theme="@style/MyMaterialTheme">
+        android:theme="@style/MyMaterialTheme" >
         <activity
             android:name=".SplashActivity"
             android:label="@string/app_name"
-            android:theme="@style/MyMaterialTheme">
+            android:theme="@style/MyMaterialTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,14 +31,14 @@
         </activity>
         <activity
             android:name=".Login"
-            android:label="@string/app_name"/>
+            android:label="@string/app_name" />
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/title_activity_register"/>
+            android:label="@string/title_activity_register" />
         <activity
             android:name=".OrderActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:label="@string/title_activity_order"/>
+            android:label="@string/title_activity_order"
+            android:windowSoftInputMode="adjustResize" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -49,10 +49,14 @@
 
         <activity
             android:name=".DashboardActivity"
-            android:label="@string/title_activity_dashboard"/>
+            android:label="@string/title_activity_dashboard" />
         <activity
             android:name=".findWorkerActivity"
-            android:label="@string/title_activity_find_worker"/>
+            android:label="@string/title_activity_find_worker" />
+        <activity
+            android:name=".WaitOrder"
+            android:label="@string/title_activity_wait_order" >
+        </activity>
     </application>
 
 </manifest>

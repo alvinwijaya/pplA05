@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -90,9 +91,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         totalWorker = (EditText) findViewById(R.id.numberWorker);
         estimateCost = (TextView) findViewById(R.id.estimateCost);
         if(estimateCost.getText().toString().equals("")){
-            estimateCost.setText(0+"");
-        }else{
-            estimateCost.setText(Integer.parseInt(estimateCost.getText().toString()) * 200000);
+            estimateCost.setText("Rp "+String.format("%,.2f",0.0));
         }
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
@@ -109,7 +108,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             alertLocation.setNegativeButton("DISAGREE", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent i = new Intent(getApplicationContext(),DashboardActivity.class);
+                    Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
                     dialog.dismiss();
                     startActivity(i);
                     finish();
@@ -117,7 +116,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 }
             });
             alertLocation.create().show();
-
+            turnGPSOn();
         }
         if(checkPlayServices()){
             if (mClient == null) {
@@ -128,7 +127,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         .build();
             }
         }
-        currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
         setUpMapIfNeeded();
         address = (EditText) findViewById(R.id.searchLocation);
         address.setScroller(new Scroller(getApplicationContext()));
@@ -154,6 +152,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             public void afterTextChanged(Editable s) {
                 try {
                     String address_value = address.getText().toString().trim();
+                    if(address_value.equals("")){
+                        Log.d("Location Default","Location is set to default");
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(-6.5801552, 106.7651841)).title("Your Location"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-6.5801552, 106.7651841), 17.0f));
+                        return;
+                    }
                     Geocoder geocoder = new Geocoder(getApplicationContext());
                     List<Address> addresses = geocoder.getFromLocationName(address_value, 1);
                     if (addresses.size() > 0) {
@@ -182,18 +186,47 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         putMarkerWithoutCurrentLocation();
                         mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         };
+        TextWatcher estimateCostWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d("Price","Price label should have changed");
+                String value = totalWorker.getText().toString().trim();
+                if(value.equals("")){
+                    estimateCost.setText("Rp "+String.format("%,.2f",0.0));
+                    return;
+                }else{
+                    estimateCost.setText("Rp "+String.format("%,.2f",(Integer.parseInt(value) * (double)200000))+"");
+                }
+
+            }
+        };
         address.addTextChangedListener(watcher);
+        totalWorker.addTextChangedListener(estimateCostWatcher);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                putOrder(filtered);
+                boolean orderAccepted = putOrder(filtered);
+                if(orderAccepted){
+                    Intent intent = new Intent(getApplicationContext(),WaitOrder.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
 
@@ -242,9 +275,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
     }
 
-    public void putOrder(final ArrayList<JSONObject> workers){
-        Log.d("Order","Order is being sent");
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/putorder", new Response.Listener<String>() {
+    public boolean putOrder(final ArrayList<JSONObject> workers){
+        Log.d("Order", "Order is being sent");
+        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/putorder", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                     Log.d("Put Result:",s);
@@ -253,15 +286,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getApplicationContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+                return;
             }
         }){
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> map = new HashMap<>();
-                JSONArray jsonArr = new JSONArray();
-                for (JSONObject json: workers){
-                    jsonArr.put(json);
-                }
                 Map<String,String> userDetails = sqlhandler.getUserDetails();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date date = new Date();
@@ -274,8 +304,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     category = "";
                     category = category+picked[0];
                 }
-                Log.d("ARRAY", jsonArr.toString());
-                map.put("workers", String.valueOf(jsonArr));
                 map.put("username", userDetails.get("username"));
                 map.put("date", dateFormat.format(date));
                 map.put("category",category);
@@ -295,12 +323,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             }
         };
         AppController.getInstance().addToRequestQueue(request);
+        return true;
     }
 
     public void getWorker(final String[] picked){
 
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/getworker", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/getworker", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try{
@@ -363,7 +392,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     protected void onStop() {
         super.onStop();
-
+        turnGPSOff();
     }
 
     @Override
@@ -377,6 +406,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        turnGPSOn();
     }
 
     /**
@@ -460,19 +490,35 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         if(currentLoc != null){
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
-            Log.d("Location: ",latitude+" " + longitude);
+            Log.d("Location: ", latitude + " " + longitude);
             setUpMap();
             String[] picked = session.getPickedCategory();
             getWorker(picked);
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                public void run() {
-                    putMarker();
-                }
-            }, 1000);
+        }
+    }
+    private void turnGPSOn(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+        if(!provider.contains("gps")){ //if gps is disabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
         }
     }
 
+    private void turnGPSOff(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+        if(provider.contains("gps")){ //if gps is enabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
+        }
+    }
     @Override
     public void onConnectionSuspended(int i) {
 
