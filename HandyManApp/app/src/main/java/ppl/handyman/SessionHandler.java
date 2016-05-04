@@ -55,7 +55,6 @@ public class SessionHandler {
 
         return pref.getBoolean(KEY_IS_LOGGED_IN, false);
     }
-
     public void setPickedCategory(TreeSet<String> pickedCategory){
         editor.putStringSet("Picked Category",pickedCategory);
         editor.commit();

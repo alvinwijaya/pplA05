@@ -8,6 +8,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +26,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -68,6 +70,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private ArrayList<JSONObject> filtered;
     private Button orderBtn;
     private EditText detailWork;
+    private EditText totalWorker;
+    private TextView estimateCost;
+    private boolean firstTime = false;
     private final double DISTANCE_TO_WORKER = 5000;
     private double latitude;
     private double longitude;
@@ -83,6 +88,11 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         filtered = new ArrayList<>();
         orderBtn = (Button) findViewById(R.id.order);
         detailWork = (EditText) findViewById(R.id.detailWork);
+        totalWorker = (EditText) findViewById(R.id.numberWorker);
+        estimateCost = (TextView) findViewById(R.id.estimateCost);
+        if(estimateCost.getText().toString().equals("")){
+            estimateCost.setText("Rp "+String.format("%,.2f",0.0));
+        }
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
             alertLocation.setMessage("Let Google help apps to determine location. This means sending anonymous location data to Google.").setTitle("Use Location?");
@@ -98,7 +108,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             alertLocation.setNegativeButton("DISAGREE", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent i = new Intent(getApplicationContext(),DashboardActivity.class);
+                    Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
                     dialog.dismiss();
                     startActivity(i);
                     finish();
@@ -106,7 +116,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 }
             });
             alertLocation.create().show();
-
+            turnGPSOn();
         }
         if(checkPlayServices()){
             if (mClient == null) {
@@ -117,11 +127,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         .build();
             }
         }
-        currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
         setUpMapIfNeeded();
-        String[] picked = session.getPickedCategory();
-        getWorker(picked);
-        putMarker();
         address = (EditText) findViewById(R.id.searchLocation);
         address.setScroller(new Scroller(getApplicationContext()));
         address.setMaxLines(1);
@@ -146,6 +152,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             public void afterTextChanged(Editable s) {
                 try {
                     String address_value = address.getText().toString().trim();
+                    if(address_value.equals("")){
+                        Log.d("Location Default","Location is set to default");
+                        mMap.addMarker(new MarkerOptions().position(new LatLng(-6.5801552, 106.7651841)).title("Your Location"));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-6.5801552, 106.7651841), 17.0f));
+                        return;
+                    }
                     Geocoder geocoder = new Geocoder(getApplicationContext());
                     List<Address> addresses = geocoder.getFromLocationName(address_value, 1);
                     if (addresses.size() > 0) {
@@ -167,25 +179,54 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                                 mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Your Location"));
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
                             }
-                        }, 1000);
+                        }, 500);
 
                     } else {
                         //this location supposed to be your current location (still hardcoded)
                         putMarkerWithoutCurrentLocation();
                         mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
-
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         };
+        TextWatcher estimateCostWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d("Price","Price label should have changed");
+                String value = totalWorker.getText().toString().trim();
+                if(value.equals("")){
+                    estimateCost.setText("Rp "+String.format("%,.2f",0.0));
+                    return;
+                }else{
+                    estimateCost.setText("Rp "+String.format("%,.2f",(Integer.parseInt(value) * (double)200000))+"");
+                }
+
+            }
+        };
         address.addTextChangedListener(watcher);
+        totalWorker.addTextChangedListener(estimateCostWatcher);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                putOrder(filtered);
+                boolean orderAccepted = putOrder(filtered);
+                if(orderAccepted){
+                    Intent intent = new Intent(getApplicationContext(),WaitOrderActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             }
         });
 
@@ -215,6 +256,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         for(JSONObject json: this.filtered){
             try {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
+                Log.d("Marker", "Marker was added");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -233,9 +275,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
     }
 
-    public void putOrder(final ArrayList<JSONObject> workers){
-        Log.d("Order","Order is being sent");
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/putorder", new Response.Listener<String>() {
+    public boolean putOrder(final ArrayList<JSONObject> workers){
+        Log.d("Order", "Order is being sent");
+        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/putorder", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                     Log.d("Put Result:",s);
@@ -244,15 +286,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getApplicationContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+                return;
             }
         }){
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> map = new HashMap<>();
-                JSONArray jsonArr = new JSONArray();
-                for (JSONObject json: workers){
-                    jsonArr.put(json);
-                }
                 Map<String,String> userDetails = sqlhandler.getUserDetails();
                 DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 Date date = new Date();
@@ -265,14 +304,14 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     category = "";
                     category = category+picked[0];
                 }
-                Log.d("ARRAY", jsonArr.toString());
-                map.put("workers", String.valueOf(jsonArr));
                 map.put("username", userDetails.get("username"));
                 map.put("date", dateFormat.format(date));
                 map.put("category",category);
                 map.put("rating","0");
                 map.put("review","");
                 map.put("details",detailWork.getText().toString());
+                map.put("status",false+"");
+                map.put("totalWorker",totalWorker.getText().toString());
                 if(address.getText().equals("")){
                     map.put("address",userDetails.get("address"));
                 }else{
@@ -284,12 +323,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             }
         };
         AppController.getInstance().addToRequestQueue(request);
+        return true;
     }
 
     public void getWorker(final String[] picked){
 
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/user.php/getworker", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/getworker", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try{
@@ -309,8 +349,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                                 filtered.add(json);
                             }
                         }
+                        putMarker();
                     }else {
                         Log.d("","Current loc null");
+                    }
+                    if(firstTime){
+                        firstTime = !firstTime;
+                        putMarker();
                     }
                 }catch (JSONException e){
                     Toast.makeText(getApplicationContext(),"JSON Error " + e.getMessage(),Toast.LENGTH_LONG).show();
@@ -348,7 +393,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     protected void onStop() {
         super.onStop();
-
+        turnGPSOff();
     }
 
     @Override
@@ -362,6 +407,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+        turnGPSOn();
     }
 
     /**
@@ -396,6 +442,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             if (mMap != null) {
 
                 setUpMap();
+                String[] picked = session.getPickedCategory();
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(final LatLng latLng) {
@@ -441,17 +488,47 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
+        Log.d("Connected","Now connected");
         currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
         if(currentLoc != null){
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
-            Log.d("Location: ",latitude+" " + longitude);
-            mMap.clear();
-            setUpMap();
+            Log.d("Location: ", latitude + " " + longitude);
+            String [] picked = session.getPickedCategory();
+            getWorker(picked);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setUpMapIfNeeded();
+                }
+            }, 1000);
 
         }
     }
+    private void turnGPSOn(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 
+        if(!provider.contains("gps")){ //if gps is disabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
+        }
+    }
+
+    private void turnGPSOff(){
+        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
+
+        if(provider.contains("gps")){ //if gps is enabled
+            final Intent poke = new Intent();
+            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
+            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
+            poke.setData(Uri.parse("3"));
+            sendBroadcast(poke);
+        }
+    }
     @Override
     public void onConnectionSuspended(int i) {
 
