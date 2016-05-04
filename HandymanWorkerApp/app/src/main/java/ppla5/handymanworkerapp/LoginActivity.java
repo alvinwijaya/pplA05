@@ -3,10 +3,8 @@ package ppla5.handymanworkerapp;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -115,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
         pDialog.setMessage("Logging in ...");
         showDialog();
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.43.229/HandyMan/worker.php/login", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.1.104/HandyMan/worker.php/login", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Log.d(LoginActivity.class.getSimpleName(), "Login Response: " + s.toString());
@@ -123,8 +121,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 try{
                     JSONObject json = new JSONObject(s);
-                    boolean authorized = json.getBoolean("sts");
-                    if(authorized){
+                    boolean error = json.getBoolean("error");
+                    if(!error){
                         session.setLogin(true);
                         String username = json.getString("username");
                         String password = json.getString("password");
