@@ -128,6 +128,19 @@ function putOrder(){
 	$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
 	$result = $db->query($sql);
 
+	$order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
+	$result= $db->query($order_id_sql);
+	$order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
+	$order_id = $order_id_fetch->id;
+
+	$workers = $app->request->post('workers');
+	$arrJson  = json_decode($workers);
+	foreach ($arrJson as $key => $value) {
+		$worker_username = $value->username;
+		$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
+		$put_worker_order = $db->query($worker_order_sql);
+	}
+
 } 
 
 function getWorkerByCategories(){
