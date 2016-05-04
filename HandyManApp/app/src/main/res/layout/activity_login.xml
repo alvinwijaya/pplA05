@@ -11,6 +11,7 @@
     <ImageView
         android:layout_width="150dp"
         android:layout_height="150dp"
+        android:layout_marginTop="20dp"
         android:src="@drawable/handymanicoo"
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
@@ -27,8 +28,8 @@
         android:layout_marginTop="160dp"/>
     <EditText
         android:id="@+id/username"
-        android:layout_width="260dp"
-        android:layout_height="40dp"
+        android:layout_width="280dp"
+        android:layout_height="50dp"
         android:inputType="textEmailAddress"
         android:hint="Email"
 		android:textColorHint="@color/colorPrimaryDark"
@@ -39,15 +40,15 @@
         
         android:fontFamily="sans-serif-light"
         android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
+
         android:paddingLeft="10dp"
         />
 
     <EditText
         android:id="@+id/password"
         android:layout_below="@+id/username"
-        android:layout_width="260dp"
-        android:layout_height="40dp"
+        android:layout_width="280dp"
+        android:layout_height="50dp"
         android:inputType="textPassword"
         android:ems="10"
         android:layout_marginTop="16dp"
@@ -55,7 +56,6 @@
 		android:textColorHint="@color/colorPrimaryDark"
         android:layout_centerHorizontal="true"
         android:textColor="@color/colorPrimaryDark"
-        android:textStyle="bold"
         
         android:fontFamily="sans-serif-light"
         android:paddingLeft="10dp"/>
@@ -82,11 +82,12 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_centerHorizontal="true"
+        android:layout_below="@+id/login"
         android:text="Not a member? Register Here"
         android:textAlignment="center"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="16dp"
-        android:layout_marginTop="380dp"
+        android:layout_marginTop="20dp"
         android:textStyle="bold"
         android:clickable="true"
         />
