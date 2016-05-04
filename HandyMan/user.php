@@ -39,6 +39,9 @@ $app->get('/', function () {
 $app->post('/getworker','getWorkerByCategories');
 
 $app->post('/putorder','putOrder');
+
+//$app->post('/giverating','giveRating');
+
 $app->post('/getmeworker','getMeWorker');
 // PUT route
 $app->put('/put',function() {
@@ -58,55 +61,68 @@ $app->delete(
     }
 );
 
+//given username get all worker
+function getMeWorker(){
+	$app = \Slim\Slim::getInstance();
+	$db = connectDB();
+	$username = $app->request->post('username');
+	$worker_list = array();
+	$worker_data_list = array();
+	//get all order from database
+	$order_sql = "SELECT * FROM user_order WHERE user_username='$username'";
+	$order = $db->query($order_sql);
+	$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
+	foreach ($fetch_worker as $row) {
+		//get_all_worker
+		$id = $row['id'];
+		$worker_sql = "SELECT worker_username FROM worker_order WHERE worker_user_id='$id'";
+		$worker = $db->query($worker_sql);
+		$fetch_worker = $worker->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($fetch_worker as $my_worker) {
+			# code...
+			if(!in_array($my_worker, worker_list)){
+				array_push($worker_list, $my_worker);
+				$worker_data_sql = "SELECT * FROM worker WHERE username='$my_worker'";
+				$worker_data = $db->query($worker_data_sql);
+				$fetch_worker_data = $worker_data->fetch(PDO::FETCH_ASSOC);
+			}
+		}
+	}
+
+}
+
 function putOrder(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
 	
-		$db = connectDB();
-		$userDetails = $app->request->post('user');
-		$jsonUser = json_encode($userDetails);
-		$username = $app->request->post('username');
-		$category = $app->request->post('category');
-		$order_status = $app->request->post('order_status');
-		$total_worker = $app->request->post('total_worker');
-		$date = $app->request->post('date');
-		$rating = $app->request->post("rating");
-		$review = $app->request->post("review");
-		$details = $app->request->post("details");
-		$address = $app->request->post("address");
-		$latittude = $app->request->post("latitude");
-		$longitude = $app->request->post("longitude");
-		
-		$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
-		$result = $db->query($sql);
+	$db = connectDB();
+	$userDetails = $app->request->post('user');
+	$jsonUser = json_encode($userDetails);
+	$username = $app->request->post('username');
+	$category = $app->request->post('category');
+	$order_status = $app->request->post('order_status');
+	$total_worker = $app->request->post('total_worker');
+	$date = $app->request->post('date');
+	$rating = $app->request->post("rating");
+	$review = $app->request->post("review");
+	$details = $app->request->post("details");
+	$address = $app->request->post("address");
+	$latittude = $app->request->post("latitude");
+	$longitude = $app->request->post("longitude");
+	
+	$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
+	$result = $db->query($sql);
 
-		// $order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
-		// $result= $db->query($order_id_sql);
-		// $order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
-		// $order_id = $order_id_fetch->id;
-
-		// $workers = $app->request->post('workers');
-		// $arrJson  = json_decode($workers);
-		// foreach ($arrJson as $key => $value) {
-		// 	$worker_username = $value->username;
-		// 	$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
-		// 	$put_worker_order = $db->query($worker_order_sql);
-		// }
-	} 
+} 
 
 function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
 	// categories are array of string
 	$category1 = $app->request->post('category1');
-	$category2 = $app->request->post('category2');
 	try{
 		$db = connectDB();
-		$sql = "select * from worker where tag LIKE '%$category1%' OR tag LIKE '%$category2%'";
-		if (!$category2) {
-			$sql = "select * from worker where tag LIKE '%$category1%'";
-		}
-		
+		$sql = "select * from worker where tag LIKE '%$category1%'";
 		$result = $db->query($sql);
 		$fetch = $result->fetchAll(PDO::FETCH_ASSOC);
 		if(empty($fetch)){
@@ -172,10 +188,12 @@ function register(){
 	}
 	
 }
+
 function to_json($error,$message){
 	$row = array('error' => $error, 'message' => $message);
 	return json_encode($row);
 }
+
 function connectDB(){
 	try{
 		// silahkan ganti dbname,password ke database yang benar
