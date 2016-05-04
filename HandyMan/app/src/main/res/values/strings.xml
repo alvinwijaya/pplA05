@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">HandyMan</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Logout</string>
+    <string name="title_activity_main">Dashboard</string>
+    <string name="title_activity_register">Register</string>
+    <string name="title_activity_order">Map</string>
+    <string name="title_activity_dashboard">Dashboard</string>
+    <string name="address_prompt">Silahkan Pilih Alamat</string>
+    <string-array name="address_array">
+        <item>Alamat1</item>
+        <item>Alamat2</item>
+        <item>Alamat3</item>
+    </string-array>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_find_worker">Find Worker</string>
+    <string name="title_activity_wait_order">Order</string>
+</resources>
