@@ -31,13 +31,13 @@ $app = new \Slim\Slim();
  */
 
 // GET route
-$app->get('/get',function() {
+$app->get('/', function () {
 	echo "This is GET";
 });
 
 // POST route .method name
 $app->post('/login', 'login');
-$app->post('/getorder','getOrder');
+$app->post('/register','register');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -59,7 +59,7 @@ $app->delete(
 function login(){
 	$app = \Slim\Slim::getInstance();
 	//$app->response()->header("Content-Type","application/json");
-	$error = false;
+	$status = false;
 	// $json_data = $app->request()->getBody();
 	// $data = json_encode($json_data);
 	// $username = $data->username;
@@ -76,10 +76,10 @@ function login(){
 		$fetch = $result->fetch(PDO::FETCH_OBJ);
 		//var_dump($fetch);
 		if(empty($fetch)){
-			echo json_encode(to_json(true, "Wrong Username or Password"));
+			echo json_encode(to_json(false, "Wrong Username or Password"));
 		}else{
 			$res = array(
-					'error' => false,
+					'sts' => true,
 					'username' => $fetch->username,
 					'password' => $fetch->password,
 					'name' => $fetch->name,
@@ -100,59 +100,45 @@ function login(){
 	
 }
 
-function getOrder(){
+function register(){
 	$app = \Slim\Slim::getInstance();
-	$error = false;
-	$status = $app->request->post('status');  
+	//$app->response()->header("Content-Type","application/json");
+	//$status = false;
+// 	$json_data = $app->request()->getBody();
+// 	$data = json_decode($json_data);
+	$username = $app->request->post('username');
+	$password = sha1($app->request->post('password'));
+	$address = $app->request->post('address');
+	$name = $app->request->post('name');
+	$tag = $app->request->post('tag');
+
 	try{
 		$db = connectDB();
-		$sql = "SELECT * FROM user_order WHERE order_status='0'";
-		$result = $db->query($sql);
-		$fetch = $result->fetchall(PDO::FETCH_ASSOC);
+		$sql_check = "select * from worker where username='$username'";
+		$check = $db->query($sql_check);
+		$fetch = $check->fetch(PDO::FETCH_OBJ);
 	
 		if(empty($fetch)){
-			echo json_encode(to_json(true, "There are no Order"));
+			//address,latitude,longitude,
+			$sql = "insert into worker (username, password, name,address,tag) values ('$username','$password','$name','$address','$tag')";
+			$result = $db->query($sql);
+			$res = to_json(true, "Thank you for registering");
+			echo $res;
 		}
 		else{
-			//foreach ($fetch as $row) {
-			//	echo $row['id'];
-			//}
-			//$sql_check = "SELECT * FROM user_order WHERE id='$order_id'";
-			//$result_check = $db->query($result_check);
-			//$fetch_check = $result_check->fetch(PDO::FETCH_ASSOC);
-			//$sql_check_worker = "SELECT COUNT(*) FROM worker_order WHERE id ='$order_id'";
-			//$result_check_worker = $db->query($result_check_worker);
-			//echo $result_check_worker;
-			$res = array();
-			foreach ($fetch as $row) {
-				array_push(
-					$res,
-					array(
-						'error' => false,
-						'user_username' => $row['user_username'],
-						'date' => $row['date'],
-						'order_status' => $row['order_status'],
-						'total_worker' => $row['total_worker'],
-						'category' => $row['category'],
-						'rating' => $row['rating'],
-						'review'=> $row['review'],
-						'details'=>$row['details'],
-						'address'=> $row['address'],
-						'latitude'=> $row['latitude'],
-						'longitude' => $row['longitude']
-					)
-				);
-			}
-			echo json_encode($res);
+			
+			$res = to_json(false, "User already exists");
+			echo $res;
 		}
 	}catch (PDOException $databaseERROR){
 		echo "Something went wrong" . $databaseERROR->getMessage();
 	}
+	
 }
 
 
-function to_json($error,$message){
-	$row = array('error' => $error, 'message' => $message);
+function to_json($status,$message){
+	$row = array('status' => $status, 'message' => $message);
 	return json_encode($row);
 }
 
@@ -164,13 +150,13 @@ function connectDB(){
 		// silahkan ganti dbname,password ke database yang benar
 		$dsn = 'mysql:dbname=handyman;host=127.0.0.1';
 		$dbuser = 'root';
-		$password = 'root';	
+		$password = '';	
 		$conn = new PDO($dsn,$dbuser,$password);
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $conn;
 	}
 	catch(PDOException $asd){
-		echo 'Error when trying to connect to database';
+		echo 'Error when trying to connect to databse';
 	}
 }
 /**

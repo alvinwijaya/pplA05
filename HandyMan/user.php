@@ -64,30 +64,44 @@ $app->delete(
 //given username get all worker
 function getMeWorker(){
 	$app = \Slim\Slim::getInstance();
-	$db = connectDB();
-	$username = $app->request->post('username');
-	$worker_list = array();
-	$worker_data_list = array();
-	//get all order from database
-	$order_sql = "SELECT * FROM user_order WHERE user_username='$username'";
-	$order = $db->query($order_sql);
-	$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
-	foreach ($fetch_worker as $row) {
-		//get_all_worker
-		$id = $row['id'];
-		$worker_sql = "SELECT worker_username FROM worker_order WHERE worker_user_id='$id'";
-		$worker = $db->query($worker_sql);
-		$fetch_worker = $worker->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($fetch_worker as $my_worker) {
-			# code...
-			if(!in_array($my_worker, worker_list)){
-				array_push($worker_list, $my_worker);
-				$worker_data_sql = "SELECT * FROM worker WHERE username='$my_worker'";
-				$worker_data = $db->query($worker_data_sql);
-				$fetch_worker_data = $worker_data->fetch(PDO::FETCH_ASSOC);
+	try {
+		$db = connectDB();
+		$username = $app->request->post('username');
+		$worker_list = array();
+		$worker_data_list = array();
+		//get all order from database
+		$order_sql = "SELECT * FROM user_order WHERE user_username='$username'";
+		$order = $db->query($order_sql);
+		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($fetch_worker as $row) {
+			//get_all_worker
+			$id = $row['id'];
+			$worker_sql = "SELECT worker_username FROM worker_order WHERE worker_user_id='$id'";
+			$worker = $db->query($worker_sql);
+			$fetch_worker = $worker->fetchAll(PDO::FETCH_ASSOC);
+			foreach ($fetch_worker as $my_worker) {
+				# code...
+				if(!in_array($my_worker, worker_list)){
+					array_push($worker_list, $my_worker);
+					$worker_data_sql = "SELECT * FROM worker WHERE username='$my_worker'";
+					$worker_data = $db->query($worker_data_sql);
+					$fetch_worker_data = $worker_data->fetch(PDO::FETCH_ASSOC);
+					array_push($worker_data_list,
+						array(
+							'username' => $fetch_worker_data["username"];
+							'name' => $fetch_worker_data["name"];
+							'photo' => $fetch_worker_data["photo"];
+							'tag' => $fetch_worker_data["tag"];
+							'rating' => $fetch_worker_data["rating"];
+							);
+				}
 			}
 		}
+	} catch (Exception $e) {
+		echo $e;
 	}
+	
+	echo json_encode($worker_data_list);
 
 }
 
