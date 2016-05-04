@@ -54,7 +54,7 @@
             android:name=".findWorkerActivity"
             android:label="@string/title_activity_find_worker" />
         <activity
-            android:name=".WaitOrder"
+            android:name=".WaitOrderActivity"
             android:label="@string/title_activity_wait_order" >
         </activity>
     </application>

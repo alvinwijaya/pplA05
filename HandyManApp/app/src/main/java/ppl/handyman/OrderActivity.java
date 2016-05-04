@@ -179,7 +179,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                                 mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Your Location"));
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
                             }
-                        }, 1000);
+                        }, 500);
 
                     } else {
                         //this location supposed to be your current location (still hardcoded)
@@ -223,7 +223,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             public void onClick(View v) {
                 boolean orderAccepted = putOrder(filtered);
                 if(orderAccepted){
-                    Intent intent = new Intent(getApplicationContext(),WaitOrder.class);
+                    Intent intent = new Intent(getApplicationContext(),WaitOrderActivity.class);
                     startActivity(intent);
                     finish();
                 }
@@ -349,6 +349,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                                 filtered.add(json);
                             }
                         }
+                        putMarker();
                     }else {
                         Log.d("","Current loc null");
                     }
@@ -441,6 +442,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             if (mMap != null) {
 
                 setUpMap();
+                String[] picked = session.getPickedCategory();
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(final LatLng latLng) {
@@ -486,14 +488,22 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle bundle) {
+        Log.d("Connected","Now connected");
         currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
         if(currentLoc != null){
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
             Log.d("Location: ", latitude + " " + longitude);
-            setUpMap();
-            String[] picked = session.getPickedCategory();
+            String [] picked = session.getPickedCategory();
             getWorker(picked);
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    setUpMapIfNeeded();
+                }
+            }, 1000);
+
         }
     }
     private void turnGPSOn(){

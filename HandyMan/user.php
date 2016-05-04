@@ -37,8 +37,9 @@ $app->get('/', function () {
 
 // POST route .method name
 $app->post('/getworker','getWorkerByCategories');
-$app->post('/putorder','putOrder');
 
+$app->post('/putorder','putOrder');
+$app->post('/getmeworker','getMeWorker');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
