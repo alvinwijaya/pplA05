@@ -88,12 +88,13 @@ function getMeWorker(){
 					$fetch_worker_data = $worker_data->fetch(PDO::FETCH_ASSOC);
 					array_push($worker_data_list,
 						array(
-							'username' => $fetch_worker_data["username"];
-							'name' => $fetch_worker_data["name"];
-							'photo' => $fetch_worker_data["photo"];
-							'tag' => $fetch_worker_data["tag"];
-							'rating' => $fetch_worker_data["rating"];
-							);
+							'username' => $fetch_worker_data["username"],
+							'name' => $fetch_worker_data["name"],
+							'photo' => $fetch_worker_data["photo"],
+							'tag' => $fetch_worker_data["tag"],
+							'rating' => $fetch_worker_data["rating"]
+							)
+					);
 				}
 			}
 		}
@@ -133,10 +134,10 @@ function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
 	// categories are array of string
-	$category1 = $app->request->post('category1');
+	$category = $app->request->post('category');
 	try{
 		$db = connectDB();
-		$sql = "select * from worker where tag LIKE '%$category1%'";
+		$sql = "select * from worker where tag LIKE '%$category%'";
 		$result = $db->query($sql);
 		$fetch = $result->fetchAll(PDO::FETCH_ASSOC);
 		if(empty($fetch)){
@@ -152,7 +153,6 @@ function getWorkerByCategories(){
 						'address' => $row['address'],
 						'tag' => $row['tag'],
 						'rating' => $row['rating'],
-						'status' => $row['status'],
 						'name'=> $row['name'],
 						'photo'=> $row['photo'],
 						'latitude'=> $row['latitude'],
