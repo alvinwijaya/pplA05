@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -50,6 +52,8 @@ public class SearchFragment extends Fragment {
          * TO DO:
          * WE NEED TO REFACTOR THIS CODE!!!
          */
+        final Animation animScale = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_scale);
+
         View view = inflater.inflate(R.layout.fragment_newsearch, container, false);
         search = (Button) view.findViewById(R.id.buttonNextOrder);
         gridview = (GridView) view.findViewById(R.id.gridview);
@@ -214,6 +218,7 @@ public class SearchFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //save data to a bundle so data wont be destroyed
+                v.startAnimation(animScale);
                 if(pickedCategory.size()==0){
                     Toast.makeText(getActivity(),"You must choose at least 1 category",Toast.LENGTH_LONG).show();
                 }else{

@@ -44,10 +44,10 @@
         android:padding="5dp"
         android:text="Next"
         android:fontFamily="sans-serif"
-        android:textColor="@color/colorPrimaryDark"
+        android:textColor="@color/white"
         android:textSize="18sp"
         android:textAlignment="center"
-        android:background="@drawable/button_invisible"
+        android:background="@drawable/buttonfilled"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/gridview"
         />

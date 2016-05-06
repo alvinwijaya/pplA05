@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -44,6 +46,9 @@ public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        final Animation animScale = AnimationUtils.loadAnimation(this, R.anim.anim_scale);
+
         // Progress dialog
         pDialog = new ProgressDialog(this);
         pDialog.setCancelable(false);
@@ -61,6 +66,8 @@ public class Login extends AppCompatActivity {
             inputUsername = (EditText) findViewById(R.id.username);
             inputPassword = (EditText) findViewById(R.id.password);
             login = (Button) findViewById(R.id.login);
+
+
             register = (TextView) findViewById(R.id.register);
             register.setOnClickListener(new View.OnClickListener(){
                 @Override
@@ -75,6 +82,7 @@ public class Login extends AppCompatActivity {
                 login.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        v.startAnimation(animScale);
                         String email = inputUsername.getText().toString().trim();
                         String password = inputPassword.getText().toString();
                         boolean emailValid = emailValidator(email);

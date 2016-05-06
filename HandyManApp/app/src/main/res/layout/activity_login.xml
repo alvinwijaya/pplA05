@@ -69,9 +69,8 @@
         android:layout_below="@+id/password"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-
-        android:background="@drawable/button_invisible"
-        android:textColor="@color/colorPrimaryDark"
+        android:background="@drawable/buttonfilled"
+        android:textColor="@color/white"
         android:fontFamily="sans-serif-light"
 
         android:layout_gravity="center_horizontal"/>

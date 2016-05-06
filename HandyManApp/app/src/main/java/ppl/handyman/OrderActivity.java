@@ -21,6 +21,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -81,7 +83,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
-
+        final Animation animScale = AnimationUtils.loadAnimation(this, R.anim.anim_scale);
         session = new SessionHandler(getApplicationContext());
         sqlhandler = new SQLiteHandler(getApplicationContext());
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -221,6 +223,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                v.startAnimation(animScale);
                 boolean orderAccepted = putOrder(filtered);
                 if(orderAccepted){
                     Intent intent = new Intent(getApplicationContext(),WaitOrder.class);

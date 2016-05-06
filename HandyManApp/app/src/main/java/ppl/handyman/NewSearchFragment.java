@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -35,20 +37,25 @@ public class NewSearchFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         session = new SessionHandler(getContext());
         sql = new SQLiteHandler(getContext());
         session = new SessionHandler(getContext());
         pickedCategory = new TreeSet<>();
+
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        final Animation animScale = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_scale);
 
-        View view = inflater.inflate(R.layout.fragment_newsearch, container, false);
+        // Inflate the layout for this fragment
+        final View view = inflater.inflate(R.layout.fragment_newsearch, container, false);
         search = (Button) view.findViewById(R.id.buttonNextOrder);
+
+
         gridview = (GridView) view.findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(view.getContext()));
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -277,13 +284,21 @@ public class NewSearchFragment extends Fragment {
 //                }
 //            }
 //        });
+
         search.setOnClickListener(new View.OnClickListener() {
+            //final Animation animScale = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_scale);
+
             @Override
+
             public void onClick(View v) {
+                //v.startAnimation(animScale);
+                v.startAnimation(animScale);
                 //save data to a bundle so data wont be destroyed
                 if(pickedCategory.size()==0){
-                    Toast.makeText(getActivity(),"You must choose at least 1 category",Toast.LENGTH_LONG).show();
+                    //v.startAnimation(animScale);
+                    Toast.makeText(getActivity(),"You must choose at least 1 category",Toast.LENGTH_SHORT).show();
                 }else{
+                    //v.startAnimation(animScale);
                     session.setPickedCategory(pickedCategory);
                     Intent intent = new Intent(getContext(),OrderActivity.class);
                     startActivity(intent);
