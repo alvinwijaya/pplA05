@@ -14,13 +14,11 @@ import java.util.ArrayList;
  * Created by Ari on 4/12/2016.
  */
 public class FavoritFragment extends Fragment {
-    public FavoritFragment(){
 
-    }
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+
     }
     public ArrayList<JSONArray> getWorkerThatHaveWorkedForMe(){
 

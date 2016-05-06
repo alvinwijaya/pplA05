@@ -43,6 +43,8 @@ $app->post('/putorder','putOrder');
 //$app->post('/giverating','giveRating');
 
 $app->post('/getmeworker','getMeWorker');
+
+$app->post('/hasvoted','getHasVotedWorker');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -74,16 +76,17 @@ function getMeWorker(){
 		$order = $db->query($order_sql);
 		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($fetch_worker as $row) {
-			//get_all_worker
+			//get_all_worker in some order
 			$id = $row['id'];
-			$worker_sql = "SELECT worker_username FROM worker_order WHERE worker_user_id='$id'";
+			$worker_sql = "SELECT worker_username FROM worker_order WHERE user_order_id='$id' AND worker_username NOT IN (SELECT user_has_rated.worker_username FROM user_has_rated WHERE user_username='$username');";
 			$worker = $db->query($worker_sql);
 			$fetch_worker = $worker->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($fetch_worker as $my_worker) {
-				# code...
-				if(!in_array($my_worker, worker_list)){
+				# get all worker username that user
+				if(!in_array($worker_list,$my_worker)){
 					array_push($worker_list, $my_worker);
-					$worker_data_sql = "SELECT * FROM worker WHERE username='$my_worker'";
+					$worker_name = $my_worker['worker_username'];
+					$worker_data_sql = "SELECT * FROM worker WHERE username='$worker_name'";
 					$worker_data = $db->query($worker_data_sql);
 					$fetch_worker_data = $worker_data->fetch(PDO::FETCH_ASSOC);
 					array_push($worker_data_list,
@@ -103,8 +106,8 @@ function getMeWorker(){
 	}
 	
 	echo json_encode($worker_data_list);
-
 }
+
 
 function putOrder(){
 	$app = \Slim\Slim::getInstance();

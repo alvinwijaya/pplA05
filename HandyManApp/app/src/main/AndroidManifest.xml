@@ -51,7 +51,7 @@
             android:name=".DashboardActivity"
             android:label="@string/title_activity_dashboard" />
         <activity
-            android:name=".findWorkerActivity"
+            android:name=".FindWorkerActivity"
             android:label="@string/title_activity_find_worker" />
         <activity
             android:name=".WaitOrderActivity"

@@ -371,13 +371,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             protected Map<String,String> getParams(){
                 List<String> pickedCategories = new ArrayList<>(Arrays.asList(picked));
                 Map<String,String> map = new HashMap<>();
-                map.put("category1",pickedCategories.get(0));
-                Log.d("category1",pickedCategories.get(0));
-                if(pickedCategories.size() > 1){
-                    map.put("category2",pickedCategories.get(1));
-                    Log.d("category2",pickedCategories.get(1));
-                }
-
+                map.put("category",pickedCategories.get(0));
+                Log.d("category",pickedCategories.get(0));
                 return map;
             }
         };
