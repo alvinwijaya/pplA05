@@ -45,6 +45,7 @@ $app->post('/putorder','putOrder');
 $app->post('/getmeworker','getMeWorker');
 $app->post('/getallworker','getAllWorker');
 $app->post('/voteworker','voteWorker');
+$app->post('/history','getHistory');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -96,6 +97,35 @@ function voteWorker(){
 	}
 	
 }
+
+function getHistory(){
+	$app = \Slim\Slim::getInstance();
+	$order_list = array();
+	try{
+		$db = connectDB();
+		$username = $app->request->post('username');
+		$sql = "SELECT * FROM user_order WHERE user_username='$username'";
+		$order = $db->query($sql);
+		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($fetch_order as $row) {
+			array_push($order_list, 
+				array(
+						'date' => $row['date'],
+						'order_status'=>$row['order_status'],
+						'category'=>$row['category'],
+						'address'=>$row['address']
+					)
+				);
+		}
+		$result = json_encode($order_list);
+		echo $result;
+
+	}catch{
+		echo "Something Wrong";
+	}
+	
+}
+
 function getAllWorker(){
 	$app = \Slim\Slim::getInstance();
 	try {
