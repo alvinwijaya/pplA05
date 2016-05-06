@@ -43,8 +43,8 @@ $app->post('/putorder','putOrder');
 //$app->post('/giverating','giveRating');
 
 $app->post('/getmeworker','getMeWorker');
-
-$app->post('/hasvoted','getHasVotedWorker');
+$app->post('/getallworker','getAllWorker');
+$app->post('/voteworker','voteWorker');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -63,7 +63,83 @@ $app->delete(
     }
 );
 
-//given username get all worker
+
+function voteWorker(){
+	$app = \Slim\Slim::getInstance();
+	try{
+		$db = connectDB();
+		$worker_username = $app->request->post('worker_username');
+		$user_username = $app->request->post('user_username');
+		$vote = intval($app->request->post('vote'));
+		//to get new ratings, the formula is as folows:
+		//(rating_before*total_voters_before + vote_now) / (total_voters_before+1)
+		$worker_rating_sql = "SELECT rating FROM worker WHERE username='$worker_username'";
+		$rating_sql_result = $db->query($worker_rating_sql);
+		$worker_rating = $rating_sql_result->fetch(PDO::FETCH_ASSOC);
+		$rating = floatval($worker_rating['rating']);
+
+		$worker_vote_history_sql = "SELECT COUNT(*) AS total FROM user_has_rated WHERE worker_username='$worker_username'";
+		$count = $db->query($worker_vote_history_sql);
+		$fetch = $count->fetch(PDO::FETCH_ASSOC);
+		$total = intval($fetch['total']);
+
+		$new_rating = floatval((($rating*$total) + $vote)/($total+1));
+
+		$update_sql = "UPDATE worker SET rating='$new_rating' WHERE username='$worker_username'";
+		$db->query($update_sql);
+
+		$insert_sql = "INSERT INTO user_has_rated (user_username,worker_username) VALUES ($user_username, $worker_username)";
+		$db->query($insert_sql);
+	}
+	catch{
+		echo "Something Wrong";
+	}
+	
+}
+function getAllWorker(){
+	$app = \Slim\Slim::getInstance();
+	try {
+		$db = connectDB();
+		$username = $app->request->post('username');
+		$worker_list = array();
+		$worker_data_list = array();
+		//get all order from database
+		$order_sql = "SELECT * FROM user_order WHERE user_username='$username'";
+		$order = $db->query($order_sql);
+		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($fetch_worker as $row) {
+			//get_all_worker in some order
+			$id = $row['id'];
+			$worker_sql = "SELECT worker_username FROM worker_order WHERE user_order_id='$id'";
+			$worker = $db->query($worker_sql);
+			$fetch_worker = $worker->fetchAll(PDO::FETCH_ASSOC);
+			foreach ($fetch_worker as $my_worker) {
+				# get all worker username that user
+				if(!in_array($worker_list,$my_worker)){
+					array_push($worker_list, $my_worker);
+					$worker_name = $my_worker['worker_username'];
+					$worker_data_sql = "SELECT * FROM worker WHERE username='$worker_name'";
+					$worker_data = $db->query($worker_data_sql);
+					$fetch_worker_data = $worker_data->fetch(PDO::FETCH_ASSOC);
+					array_push($worker_data_list,
+						array(
+							'username' => $fetch_worker_data["username"],
+							'name' => $fetch_worker_data["name"],
+							'photo' => $fetch_worker_data["photo"],
+							'tag' => $fetch_worker_data["tag"],
+							'rating' => $fetch_worker_data["rating"]
+							)
+					);
+				}
+			}
+		}
+	} catch (Exception $e) {
+		echo $e;
+	}
+	
+	echo json_encode($worker_data_list);
+}
+//given username get all worker not voted by that user
 function getMeWorker(){
 	$app = \Slim\Slim::getInstance();
 	try {
