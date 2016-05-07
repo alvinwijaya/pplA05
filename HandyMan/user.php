@@ -85,14 +85,15 @@ function voteWorker(){
 		$total = intval($fetch['total']);
 
 		$new_rating = floatval((($rating*$total) + $vote)/($total+1));
+		echo "hehe";
 
 		$update_sql = "UPDATE worker SET rating='$new_rating' WHERE username='$worker_username'";
 		$db->query($update_sql);
 
-		$insert_sql = "INSERT INTO user_has_rated (user_username,worker_username) VALUES ($user_username, $worker_username)";
+		$insert_sql = "INSERT INTO user_has_rated (user_username,worker_username) VALUES ('$user_username', '$worker_username')";
 		$db->query($insert_sql);
 	}
-	catch{
+	catch (Exception $e){
 		echo "Something Wrong";
 	}
 	
@@ -120,7 +121,7 @@ function getHistory(){
 		$result = json_encode($order_list);
 		echo $result;
 
-	}catch{
+	}catch (Exception $e){
 		echo "Something Wrong";
 	}
 	
