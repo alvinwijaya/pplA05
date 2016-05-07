@@ -8,9 +8,7 @@
  * If you are using Composer, you can skip this step.
  */
 require 'Slim/Slim.php';
-
 \Slim\Slim::registerAutoloader();
-
 /**
  * Step 2: Instantiate a Slim application
  *
@@ -20,7 +18,6 @@ require 'Slim/Slim.php';
  * of setting names and values into the application constructor.
  */
 $app = new \Slim\Slim();
-
 /**
  * Step 3: Define the Slim application routes
  *
@@ -29,19 +26,14 @@ $app = new \Slim\Slim();
  * argument for `Slim::get`, `Slim::post`, `Slim::put`, `Slim::patch`, and `Slim::delete`
  * is an anonymous function.
  */
-
 // GET route
 $app->get('/', function () {
 	echo "This is GET";
 });
-
 // POST route .method name
 $app->post('/getworker','getWorkerByCategories');
-
 $app->post('/putorder','putOrder');
-
 //$app->post('/giverating','giveRating');
-
 $app->post('/getmeworker','getMeWorker');
 $app->post('/getallworker','getAllWorker');
 $app->post('/voteworker','voteWorker');
@@ -50,12 +42,10 @@ $app->post('/history','getHistory');
 $app->put('/put',function() {
 	echo "This is PUT";
 });
-
 // PATCH route
 $app->patch('/patch', function () {
     echo 'This is a PATCH route';
 });
-
 // DELETE route
 $app->delete(
     '/delete',
@@ -63,8 +53,6 @@ $app->delete(
         echo 'This is a DELETE route';
     }
 );
-
-
 function voteWorker(){
 	$app = \Slim\Slim::getInstance();
 	try{
@@ -78,26 +66,22 @@ function voteWorker(){
 		$rating_sql_result = $db->query($worker_rating_sql);
 		$worker_rating = $rating_sql_result->fetch(PDO::FETCH_ASSOC);
 		$rating = floatval($worker_rating['rating']);
-
 		$worker_vote_history_sql = "SELECT COUNT(*) AS total FROM user_has_rated WHERE worker_username='$worker_username'";
 		$count = $db->query($worker_vote_history_sql);
 		$fetch = $count->fetch(PDO::FETCH_ASSOC);
 		$total = intval($fetch['total']);
-
 		$new_rating = floatval((($rating*$total) + $vote)/($total+1));
-
+		echo "hehe";
 		$update_sql = "UPDATE worker SET rating='$new_rating' WHERE username='$worker_username'";
 		$db->query($update_sql);
-
-		$insert_sql = "INSERT INTO user_has_rated (user_username,worker_username) VALUES ($user_username, $worker_username)";
+		$insert_sql = "INSERT INTO user_has_rated (user_username,worker_username) VALUES ('$user_username', '$worker_username')";
 		$db->query($insert_sql);
 	}
-	catch{
+	catch (Exception $e){
 		echo "Something Wrong";
 	}
 	
 }
-
 function getHistory(){
 	$app = \Slim\Slim::getInstance();
 	$order_list = array();
@@ -119,13 +103,11 @@ function getHistory(){
 		}
 		$result = json_encode($order_list);
 		echo $result;
-
-	}catch{
+	}catch (Exception $e){
 		echo "Something Wrong";
 	}
 	
 }
-
 function getAllWorker(){
 	$app = \Slim\Slim::getInstance();
 	try {
@@ -213,8 +195,6 @@ function getMeWorker(){
 	
 	echo json_encode($worker_data_list);
 }
-
-
 function putOrder(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
@@ -236,12 +216,10 @@ function putOrder(){
 	
 	$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
 	$result = $db->query($sql);
-
 	$order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
 	$result= $db->query($order_id_sql);
 	$order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
 	$order_id = $order_id_fetch->id;
-
 	$workers = $app->request->post('workers');
 	$arrJson  = json_decode($workers);
 	foreach ($arrJson as $key => $value) {
@@ -249,9 +227,7 @@ function putOrder(){
 		$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
 		$put_worker_order = $db->query($worker_order_sql);
 	}
-
 } 
-
 function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
 	$error = false;
@@ -289,7 +265,6 @@ function getWorkerByCategories(){
 	}
 	
 }
-
 function register(){
 	$app = \Slim\Slim::getInstance();
 	//$app->response()->header("Content-Type","application/json");
@@ -301,7 +276,6 @@ function register(){
 	$address = $app->request->post('address');
 	$name = $app->request->post('name');
 	$phone = $app->request->post('phone');
-
 	try{
 		$db = connectDB();
 		$sql_check = "select * from user where username='$username'";
@@ -324,12 +298,10 @@ function register(){
 	}
 	
 }
-
 function to_json($error,$message){
 	$row = array('error' => $error, 'message' => $message);
 	return json_encode($row);
 }
-
 function connectDB(){
 	try{
 		// silahkan ganti dbname,password ke database yang benar
