@@ -35,7 +35,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_TAG = "tag";
     private static final String KEY_RATING = "rating";
-    private static final String KEY_STATUS = "status";
     public SQLiteHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -48,8 +47,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
                 + KEY_PASSWORD + " text," + KEY_NAME + " varchar(255),"
                 + KEY_PHOTO + " text," + KEY_ADDRESS + " text,"
                 + KEY_LATITUDE + " double," + KEY_LONGITUDE + " double,"
-                + KEY_TAG + " text," + KEY_RATING + " float,"
-                + KEY_STATUS + " varchar(25)"
+                + KEY_TAG + " text," + KEY_RATING + " float"
                 +")";
         db.execSQL(CREATE_LOGIN_TABLE);
         Log.d(TAG, "Database tables created");
@@ -68,7 +66,7 @@ public class SQLiteHandler extends SQLiteOpenHelper {
     /**
      * Storing user details in database
      * */
-    public void addUser(String username, String password, String name, String photo, String address, double latitude, double longitude, String tag, double rating, String status) {
+    public void addUser(String username, String password, String name, String photo, String address, double latitude, double longitude, String tag, double rating) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -81,7 +79,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
         values.put(KEY_LONGITUDE, longitude); // longitude
         values.put(KEY_TAG, tag); // tag
         values.put(KEY_RATING, rating); // rating
-        values.put(KEY_STATUS, status); // status
 
 
         // Inserting Row
@@ -112,7 +109,6 @@ public class SQLiteHandler extends SQLiteOpenHelper {
             user.put("longitude", cursor.getString(7));
             user.put("tag", cursor.getString(8));
             user.put("rating", cursor.getString(9));
-            user.put("status", cursor.getString(10));
         }
         cursor.close();
         db.close();

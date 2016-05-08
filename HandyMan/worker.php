@@ -31,13 +31,13 @@ $app = new \Slim\Slim();
  */
 
 // GET route
-$app->get('/', function () {
+$app->get('/get',function() {
 	echo "This is GET";
 });
 
 // POST route .method name
 $app->post('/login', 'login');
-$app->post('/register','register');
+$app->post('/getorder','getOrderAndUpdateLocation');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -59,7 +59,7 @@ $app->delete(
 function login(){
 	$app = \Slim\Slim::getInstance();
 	//$app->response()->header("Content-Type","application/json");
-	$status = false;
+	$error = false;
 	// $json_data = $app->request()->getBody();
 	// $data = json_encode($json_data);
 	// $username = $data->username;
@@ -76,10 +76,10 @@ function login(){
 		$fetch = $result->fetch(PDO::FETCH_OBJ);
 		//var_dump($fetch);
 		if(empty($fetch)){
-			echo json_encode(to_json(false, "Wrong Username or Password"));
+			echo json_encode(to_json(true, "Wrong Username or Password"));
 		}else{
 			$res = array(
-					'sts' => true,
+					'error' => false,
 					'username' => $fetch->username,
 					'password' => $fetch->password,
 					'name' => $fetch->name,
@@ -88,8 +88,7 @@ function login(){
 					'latitude' => $fetch->latitude,
 					'longitude' => $fetch->longitude,
 					'tag' => $fetch->tag,
-					'rating' => $fetch->rating,
-					'status' => $fetch->status
+					'rating' => $fetch->rating
 			);
 			echo json_encode($res);
 		}
@@ -100,45 +99,56 @@ function login(){
 	
 }
 
-function register(){
+function getOrderAndUpdateLocation(){
 	$app = \Slim\Slim::getInstance();
-	//$app->response()->header("Content-Type","application/json");
-	//$status = false;
-// 	$json_data = $app->request()->getBody();
-// 	$data = json_decode($json_data);
+	$error = false;
+	$status = $app->request->post('status'); 
+	$latitude = $app->request->post('latitude');
+	$longitude = $app->request->post('longitude');
 	$username = $app->request->post('username');
-	$password = sha1($app->request->post('password'));
-	$address = $app->request->post('address');
-	$name = $app->request->post('name');
-	$tag = $app->request->post('tag');
-
 	try{
 		$db = connectDB();
-		$sql_check = "select * from worker where username='$username'";
-		$check = $db->query($sql_check);
-		$fetch = $check->fetch(PDO::FETCH_OBJ);
+		$sql_update = "UPDATE worker SET latitude='$latitude', longitude='$longitude' WHERE username='$username'";
+		$result_update = $db->query($sql_update);
+
+		$sql = "SELECT * FROM user_order WHERE order_status='$status'";
+		$result = $db->query($sql);
+		$fetch = $result->fetchall(PDO::FETCH_ASSOC);
 	
 		if(empty($fetch)){
-			//address,latitude,longitude,
-			$sql = "insert into worker (username, password, name,address,tag) values ('$username','$password','$name','$address','$tag')";
-			$result = $db->query($sql);
-			$res = to_json(true, "Thank you for registering");
-			echo $res;
+			echo json_encode(to_json(true, "There are no Order"));
 		}
 		else{
-			
-			$res = to_json(false, "User already exists");
-			echo $res;
+			$res = array();
+			foreach ($fetch as $row) {
+				array_push(
+					$res,
+					array(
+						'error' => false,
+						'user_username' => $row['user_username'],
+						'date' => $row['date'],
+						'order_status' => $row['order_status'],
+						'total_worker' => $row['total_worker'],
+						'category' => $row['category'],
+						'rating' => $row['rating'],
+						'review'=> $row['review'],
+						'details'=>$row['details'],
+						'address'=> $row['address'],
+						'latitude'=> $row['latitude'],
+						'longitude' => $row['longitude']
+					)
+				);
+			}
+			echo json_encode($res);
 		}
 	}catch (PDOException $databaseERROR){
 		echo "Something went wrong" . $databaseERROR->getMessage();
 	}
-	
 }
 
 
-function to_json($status,$message){
-	$row = array('status' => $status, 'message' => $message);
+function to_json($error,$message){
+	$row = array('error' => $error, 'message' => $message);
 	return json_encode($row);
 }
 
@@ -150,13 +160,13 @@ function connectDB(){
 		// silahkan ganti dbname,password ke database yang benar
 		$dsn = 'mysql:dbname=handyman;host=127.0.0.1';
 		$dbuser = 'root';
-		$password = '';	
+		$password = 'root';	
 		$conn = new PDO($dsn,$dbuser,$password);
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $conn;
 	}
 	catch(PDOException $asd){
-		echo 'Error when trying to connect to databse';
+		echo 'Error when trying to connect to database';
 	}
 }
 /**

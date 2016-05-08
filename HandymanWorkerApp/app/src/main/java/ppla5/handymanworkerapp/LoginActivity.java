@@ -113,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
         pDialog.setMessage("Logging in ...");
         showDialog();
 
-        StringRequest request = new StringRequest(Request.Method.POST, "http://192.168.1.104/HandyMan/worker.php/login", new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/worker.php/login", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Log.d(LoginActivity.class.getSimpleName(), "Login Response: " + s.toString());
@@ -133,8 +133,7 @@ public class LoginActivity extends AppCompatActivity {
                         double longitude = json.getDouble("longitude");
                         String tag = json.getString("tag");
                         double rating = json.getDouble("rating");
-                        String status = json.getString("status");
-                        sqlhandler.addUser(username,password,name,photo,address,latitude,longitude,tag,rating,status);
+                        sqlhandler.addUser(username,password,name,photo,address,latitude,longitude,tag,rating);
                         Intent in = new Intent(LoginActivity.this,MainActivity.class);
                         startActivity(in);
                         finish();

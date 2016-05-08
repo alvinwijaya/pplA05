@@ -71,7 +71,7 @@ function voteWorker(){
 		$db = connectDB();
 		$worker_username = $app->request->post('worker_username');
 		$user_username = $app->request->post('user_username');
-		$vote = intval($app->request->post('vote'));
+		$vote = floatval($app->request->post('vote'));
 		//to get new ratings, the formula is as folows:
 		//(rating_before*total_voters_before + vote_now) / (total_voters_before+1)
 		$worker_rating_sql = "SELECT rating FROM worker WHERE username='$worker_username'";
@@ -82,10 +82,9 @@ function voteWorker(){
 		$worker_vote_history_sql = "SELECT COUNT(*) AS total FROM user_has_rated WHERE worker_username='$worker_username'";
 		$count = $db->query($worker_vote_history_sql);
 		$fetch = $count->fetch(PDO::FETCH_ASSOC);
-		$total = intval($fetch['total']);
+		$total = floatval($fetch['total']);
 
 		$new_rating = floatval((($rating*$total) + $vote)/($total+1));
-		echo "hehe";
 
 		$update_sql = "UPDATE worker SET rating='$new_rating' WHERE username='$worker_username'";
 		$db->query($update_sql);
@@ -94,7 +93,7 @@ function voteWorker(){
 		$db->query($insert_sql);
 	}
 	catch (Exception $e){
-		echo "Something Wrong";
+		echo $e;
 	}
 	
 }
@@ -334,9 +333,9 @@ function to_json($error,$message){
 function connectDB(){
 	try{
 		// silahkan ganti dbname,password ke database yang benar
-		$dsn = 'mysql:dbname=handyman;host=127.0.0.1';
-		$dbuser = 'root';
-		$password = '';	
+		$dsn = 'mysql:dbname=handyman;host=localhost';
+		$dbuser = 'ppla05';
+		$password = 'ppla05';	
 		$conn = new PDO($dsn,$dbuser,$password);
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $conn;
