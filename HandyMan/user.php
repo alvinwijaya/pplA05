@@ -119,7 +119,7 @@ function getAllWorker(){
 		$order_sql = "SELECT * FROM user_order WHERE user_username='$username'";
 		$order = $db->query($order_sql);
 		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($fetch_worker as $row) {
+		foreach ($fetch_order as $row) {
 			//get_all_worker in some order
 			$id = $row['id'];
 			$worker_sql = "SELECT worker_username FROM worker_order WHERE user_order_id='$id'";
@@ -163,7 +163,7 @@ function getMeWorker(){
 		$order_sql = "SELECT * FROM user_order WHERE user_username='$username'";
 		$order = $db->query($order_sql);
 		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
-		foreach ($fetch_worker as $row) {
+		foreach ($fetch_order as $row) {
 			//get_all_worker in some order
 			$id = $row['id'];
 			$worker_sql = "SELECT worker_username FROM worker_order WHERE user_order_id='$id' AND worker_username NOT IN (SELECT user_has_rated.worker_username FROM user_has_rated WHERE user_username='$username');";
