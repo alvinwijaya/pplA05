@@ -123,7 +123,7 @@
                         out.println("<div class=\"collapsible-body\">");
                         out.println("<div class=\"container\">");
                         out.println("<div class=\"row\">");
-                        out.println("<form action=\"editHandler\" method=\"post\">");
+                        out.println("<form action=\"editHandler\" method=\"post\"  enctype=\"multipart/form-data\">");
                         out.println("<div class=\"input-field col s6\">");
                         out.println("<input type=\"email\" name=\"username\" value=\"" + resultset.getObject(1) + "\" readonly/>");
                         out.println("<label for=\"username\">Username</label>");
@@ -144,10 +144,6 @@
                         out.println("<input type=\"text\" name=\"tag\" value=\"" + resultset.getObject(8) + "\" required/>");
                         out.println("<label for=\"tag\">Tag</label>");
                         out.println("</div>");
-                        out.println("<div class=\"input-field col s12\">");
-                        out.println("<input type=\"text\" name=\"photo\" value=\"" + resultset.getObject(4) + "\" />");
-                        out.println("<label for=\"photo\">Photo Link</label>");
-                        out.println("</div>");
                         out.println("<div class=\"input-field col s6\">");
                         out.println("<input type=\"number\" step=\"any\" name=\"latitude\" value=\"" + resultset.getObject(6) + "\" />");
                         out.println("<label for=\"latitude\">Latitude</label>");
@@ -156,6 +152,7 @@
                         out.println("<input type=\"number\" step=\"any\" name=\"longitude\" value=\"" + resultset.getObject(7) + "\" />");
                         out.println("<label for=\"longitude\">Longitude</label>");
                         out.println("</div>");
+                        out.println("<input type=\"file\" name=\"photo\"/><br><br>");
                         out.println("<button class=\"btn waves-effect waves-light\" type=\"submit\" name=\"action\">Submit</button>");
                         out.println("</form></div></div></div></li>");
                         out.println("<li><div class=\"collapsible-header\">");

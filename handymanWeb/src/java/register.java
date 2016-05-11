@@ -63,7 +63,7 @@ public class register extends HttpServlet {
             out.println("<div class=\"collapsible-body\">");
             out.println("<div class=\"container\">");
             out.println("<div class=\"row\">");
-            out.println("<form action=\"registerHandler\" method=\"post\">");
+            out.println("<form action=\"registerHandler\" method=\"post\" enctype=\"multipart/form-data\">");
             out.println("<div class=\"input-field col s6\">");
             out.println("<input type=\"email\" name=\"username\" class=\"validate\" required/>");
             if (session.getAttribute("exist") != null){
@@ -89,10 +89,6 @@ public class register extends HttpServlet {
             out.println("<input type=\"text\" name=\"tag\" class=\"validate\" required/><br>");
             out.println("<label for=\"tag\">Tag</label>");
             out.println("</div>");
-            out.println("<div class=\"input-field col s12\">");
-            out.println("<input type=\"text\" name=\"photo\"/><br>");
-            out.println("<label for=\"photo\">Photo Link</label>");
-            out.println("</div>");
             out.println("<div class=\"input-field col s6\">");
             out.println("<input type=\"number\" step=\"any\" name=\"latitude\"/><br>");
             out.println("<label for=\"latitude\">Latitude</label>");
@@ -101,6 +97,7 @@ public class register extends HttpServlet {
             out.println("<input type=\"number\" step=\"any\" name=\"longitude\"/><br>");
             out.println("<label for=\"longitude\">Longitude</label>");
             out.println("</div>");
+            out.println("<input type=\"file\" name=\"photo\"/><br><br>");
             out.println("<button class=\"btn waves-effect waves-light\" type=\"submit\" name=\"action\">Register</button>");
             out.println("</form></div></div></div></li>");
             out.println("<li><div class=\"collapsible-header\">");

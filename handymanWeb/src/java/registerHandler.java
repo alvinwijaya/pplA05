@@ -4,8 +4,14 @@
  * and open the template in the editor.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import static java.lang.System.out;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,13 +24,16 @@ import java.util.*;
 import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 /**
  *
  * @author alvin
  */
 @WebServlet(urlPatterns = {"/registerHandler"})
+@MultipartConfig
 public class registerHandler extends HttpServlet {
 
     /**
@@ -92,7 +101,9 @@ public class registerHandler extends HttpServlet {
                 String name = request.getParameter("name");
                 String address = request.getParameter("address");
                 String tag = request.getParameter("tag");
-                String photo = request.getParameter("photo");
+                //name of the photo is the same with username for default
+                //can change to id or something if needed
+                String photo = username;
                 Double latitude = 0.0;
                 Double longitude = 0.0;
                 if(!request.getParameter("latitude").isEmpty()){
@@ -109,7 +120,40 @@ public class registerHandler extends HttpServlet {
 
                 statement.executeUpdate("insert into worker (username, password, name, address, tag, photo, latitude, longitude) values ('" + username + "','" + password + "','" + name + "','" + address + "','" + tag + "','" + photo + "', " + latitude + ", "  + longitude + ")");
 
-                response.sendRedirect("register");
+                //The path where photo is uploaded
+                final String path = "D:\\";
+                final Part filePart = request.getPart("photo");
+                final String fileName = photo + ".jpg";
+
+                OutputStream out = null;
+                InputStream filecontent = null;
+                final PrintWriter writer = response.getWriter();
+
+                try {
+                    out = new FileOutputStream(new File(path + File.separator + fileName));
+                    filecontent = filePart.getInputStream();
+
+                    int read = 0;
+                    final byte[] bytes = new byte[1024];
+
+                    while ((read = filecontent.read(bytes)) != -1) {
+                        out.write(bytes, 0, read);
+                    }
+                    response.sendRedirect("register");
+                } catch (FileNotFoundException fne) {
+                    writer.println("Error in file upload  ERROR:" + fne.getMessage());
+
+                } finally {
+                    if (out != null) {
+                        out.close();
+                    }
+                    if (filecontent != null) {
+                        filecontent.close();
+                    }
+                    if (writer != null) {
+                        writer.close();
+                    }
+                }
             }
             
         } catch (ClassNotFoundException ex) {
@@ -120,6 +164,17 @@ public class registerHandler extends HttpServlet {
             Logger.getLogger(registerHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
         
+    }
+    
+    private String getFileName(final Part part) {
+        final String partHeader = part.getHeader("content-disposition");
+        for (String content : part.getHeader("content-disposition").split(";")) {
+            if (content.trim().startsWith("filename")) {
+                return content.substring(
+                        content.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
     }
 
     /**

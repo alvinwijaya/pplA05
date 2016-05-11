@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:layout_margin="4dp"
     card_view:contentPadding="10dp"
-    card_view:cardCornerRadius="5dp"
-    >
+    card_view:cardCornerRadius="5dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
+        <com.google.android.gms.maps.MapView
             android:id="@+id/map"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_alignParentTop="true"
-            android:scaleType="centerCrop"
+            tools:context="ppl.handyman.MainActivity"
+            tools:layout="@layout/order_list"
+            map:liteMode="true"
             />
-
         <TextView
             android:id="@+id/name"
             android:layout_width="wrap_content"

@@ -4,7 +4,12 @@
  * and open the template in the editor.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -17,17 +22,20 @@ import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 /**
  *
  * @author alvin
  */
 @WebServlet(urlPatterns = {"/editHandler"})
+@MultipartConfig
 public class editHandler extends HttpServlet {
 
     /**
@@ -92,7 +100,7 @@ public class editHandler extends HttpServlet {
             String name = request.getParameter("name");
             String address = request.getParameter("address");
             String tag = request.getParameter("tag");
-            String photo = request.getParameter("photo");
+            
             Double latitude = 0.0;
             Double longitude = 0.0;
             if(!request.getParameter("latitude").isEmpty()){
@@ -107,9 +115,45 @@ public class editHandler extends HttpServlet {
             crypt.update(password.getBytes("UTF-8"));
             password = new BigInteger(1, crypt.digest()).toString(16);
 
-            statement.executeUpdate("insert into worker (username, password, name, address, tag, photo, latitude, longitude) values ('" + username + "','" + password + "','" + name + "','" + address + "','" + tag + "','" + photo + "', " + latitude + ", "  + longitude + ")");
+            statement.executeUpdate("insert into worker (username, password, name, address, tag, latitude, longitude) values ('" + username + "','" + password + "','" + name + "','" + address + "','" + tag + "', " + latitude + ", "  + longitude + ")");
 
-            response.sendRedirect("listWorker");
+            if(request.getPart("photo") != null){
+                final String path = "D:\\";
+                final Part filePart = request.getPart("photo");
+                final String fileName = username + ".jpg";
+
+                OutputStream out = null;
+                InputStream filecontent = null;
+                final PrintWriter writer = response.getWriter();
+
+                try {
+                    out = new FileOutputStream(new File(path + File.separator + fileName));
+                    filecontent = filePart.getInputStream();
+
+                    int read = 0;
+                    final byte[] bytes = new byte[1024];
+
+                    while ((read = filecontent.read(bytes)) != -1) {
+                        out.write(bytes, 0, read);
+                    }
+                    
+                    response.sendRedirect("listWorker");
+
+                } catch (FileNotFoundException fne) {
+                    writer.println("Error in file upload  ERROR:" + fne.getMessage());
+
+                } finally {
+                    if (out != null) {
+                        out.close();
+                    }
+                    if (filecontent != null) {
+                        filecontent.close();
+                    }
+                    if (writer != null) {
+                        writer.close();
+                    }
+                }
+            }
             
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(loginHandler.class.getName()).log(Level.SEVERE, null, ex);
