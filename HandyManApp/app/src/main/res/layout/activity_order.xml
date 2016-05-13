@@ -105,8 +105,8 @@
             android:layout_height="300dp"
             android:id="@+id/map"
             android:layout_gravity="center_horizontal"
-            tools:context="ppl.handyman.OrderActivity"
-            android:name="ppl.handyman.MapFragment"
+            tools:context="ppl.handyman.activity.OrderActivity"
+            android:name="ppl.handyman.fragment.MapFragment"
             tools:layout="@layout/activity_order" />
 
         <Button
