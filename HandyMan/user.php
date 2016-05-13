@@ -88,14 +88,18 @@ function getHistory(){
 	try{
 		$db = connectDB();
 		$username = $app->request->post('username');
-		$sql = "SELECT * FROM user_order WHERE user_username='$username'";
+		$sql = "SELECT * FROM user_order WHERE user_username='$username' AND order_status='1'";
 		$order = $db->query($sql);
 		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($fetch_order as $row) {
+			$id = $row['id'];
+			$sql_getWorker = "SELECT name FROM worker WHERE username=(SELECT worker_username FROM worker_order WHERE user_order_id='$id')";
+			$getWorker = $db->query($sql_getWorker);
+			$fetch_getWorker = $getWorker->fetch(PDO::FETCH_OBJ);
 			array_push($order_list, 
 				array(
+						'worker' => $fetch_getWorker->name,
 						'date' => $row['date'],
-						'order_status'=>$row['order_status'],
 						'category'=>$row['category'],
 						'address'=>$row['address']
 					)
@@ -200,8 +204,6 @@ function putOrder(){
 	$error = false;
 	
 	$db = connectDB();
-	$userDetails = $app->request->post('user');
-	$jsonUser = json_encode($userDetails);
 	$username = $app->request->post('username');
 	$category = $app->request->post('category');
 	$order_status = $app->request->post('order_status');
@@ -216,17 +218,17 @@ function putOrder(){
 	
 	$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
 	$result = $db->query($sql);
-	$order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
-	$result= $db->query($order_id_sql);
-	$order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
-	$order_id = $order_id_fetch->id;
-	$workers = $app->request->post('workers');
-	$arrJson  = json_decode($workers);
-	foreach ($arrJson as $key => $value) {
-		$worker_username = $value->username;
-		$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
-		$put_worker_order = $db->query($worker_order_sql);
-	}
+	// $order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
+	// $result= $db->query($order_id_sql);
+	// $order_id_fetch = $result->fetch(PDO::FETCH_OBJ);
+	// $order_id = $order_id_fetch->id;
+	// $workers = $app->request->post('workers');
+	// $arrJson  = json_decode($workers);
+	// foreach ($arrJson as $key => $value) {
+	// 	$worker_username = $value->username;
+	// 	$worker_order_sql = "INSERT INTO worker_order (user_order_id,worker_username) values ('$order_id','$worker_username')";
+	// 	$put_worker_order = $db->query($worker_order_sql);
+	// }
 } 
 function getWorkerByCategories(){
 	$app = \Slim\Slim::getInstance();
@@ -305,9 +307,9 @@ function to_json($error,$message){
 function connectDB(){
 	try{
 		// silahkan ganti dbname,password ke database yang benar
-		$dsn = 'mysql:dbname=handyman;host=127.0.0.1';
-		$dbuser = 'root';
-		$password = '';	
+		$dsn = 'mysql:dbname=handyman;host=localhost';
+		$dbuser = 'ppla05';
+		$password = 'ppla05';	
 		$conn = new PDO($dsn,$dbuser,$password);
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $conn;

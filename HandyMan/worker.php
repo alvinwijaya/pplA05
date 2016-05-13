@@ -106,39 +106,46 @@ function getOrderAndUpdateLocation(){
 	$latitude = $app->request->post('latitude');
 	$longitude = $app->request->post('longitude');
 	$username = $app->request->post('username');
+	$category = $app->request->post('category');
+	$split = explode(",", $category);
 	try{
 		$db = connectDB();
 		$sql_update = "UPDATE worker SET latitude='$latitude', longitude='$longitude' WHERE username='$username'";
 		$result_update = $db->query($sql_update);
-
-		$sql = "SELECT * FROM user_order WHERE order_status='$status'";
-		$result = $db->query($sql);
-		$fetch = $result->fetchall(PDO::FETCH_ASSOC);
-	
-		if(empty($fetch)){
-			echo json_encode(to_json(true, "There are no Order"));
-		}
-		else{
-			$res = array();
-			foreach ($fetch as $row) {
-				array_push(
+		$res = array();
+		foreach ($split as $values) {
+			$sql = "SELECT * FROM user_order WHERE order_status='$status' AND category LIKE '%$values%'";
+			$result = $db->query($sql);
+			$fetch = $result->fetchall(PDO::FETCH_ASSOC);
+			if (!empty($fetch)) {
+				foreach ($fetch as $row) {
+					$user_username = $row['user_username'];
+					$sql_get = "SELECT name,phone FROM user WHERE username='$user_username'";
+					$result_get = $db->query($sql_get);
+					$fetch_get = $result_get->fetch(PDO::FETCH_OBJ);
+					array_push(
 					$res,
 					array(
 						'error' => false,
-						'user_username' => $row['user_username'],
+						'user_name' => $fetch_get->name,
+						'phone' => $fetch_get->phone,
 						'date' => $row['date'],
 						'order_status' => $row['order_status'],
 						'total_worker' => $row['total_worker'],
 						'category' => $row['category'],
 						'rating' => $row['rating'],
-						'review'=> $row['review'],
 						'details'=>$row['details'],
 						'address'=> $row['address'],
 						'latitude'=> $row['latitude'],
 						'longitude' => $row['longitude']
-					)
-				);
+						)
+					);
+				}
 			}
+		}
+		if (empty($res)) {
+			echo to_json(true,"There are no Order");
+		} else {
 			echo json_encode($res);
 		}
 	}catch (PDOException $databaseERROR){
@@ -158,9 +165,9 @@ function to_json($error,$message){
 function connectDB(){
 	try{
 		// silahkan ganti dbname,password ke database yang benar
-		$dsn = 'mysql:dbname=handyman;host=127.0.0.1';
-		$dbuser = 'root';
-		$password = 'root';	
+		$dsn = 'mysql:dbname=handyman;host=localhost';
+		$dbuser = 'ppla05';
+		$password = 'ppla05';	
 		$conn = new PDO($dsn,$dbuser,$password);
 		$conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		return $conn;
