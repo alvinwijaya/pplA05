@@ -2,12 +2,88 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Profile"
-        android:textSize="40dp"
+        android:id="@+id/address_label"
+        android:hint="Address"
         android:textStyle="bold"
-        android:layout_centerInParent="true"/>
+        android:textSize="18sp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"/>
+
+    <TextView
+        android:id="@+id/address_delimiter"
+        android:layout_width="10dp"
+        android:layout_height="40dp"
+        android:hint=":"
+        android:layout_alignTop="@+id/address_label"
+        android:layout_toRightOf="@+id/address_label" />
+
+    <EditText
+        android:id="@+id/profile_address_value"
+        android:layout_width="10dp"
+        android:layout_height="40dp"
+        android:hint="Your address"
+        android:textSize="15sp"
+        android:layout_alignTop="@+id/address_delimiter"
+        android:layout_toRightOf="@+id/address_delimiter"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/address_delimiter" />
+
+
+
+
+    <TextView
+        android:id="@+id/phone_label"
+        android:hint="Phone"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:layout_width="80dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/address_label"/>
+
+    <TextView
+        android:id="@+id/phone_delimiter"
+        android:layout_width="10dp"
+        android:layout_height="40dp"
+        android:hint=":"
+        android:layout_below="@+id/address_delimiter"
+        android:layout_alignTop="@+id/phone_label"
+        android:layout_toRightOf="@+id/phone_label" />
+
+    <EditText
+        android:id="@+id/phone_value"
+        android:layout_width="10dp"
+        android:layout_height="40dp"
+        android:hint="Your phone"
+        android:textSize="15sp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignLeft="@id/profile_address_value"
+        android:layout_alignStart="@id/profile_address_value"
+        android:layout_alignTop="@+id/phone_delimiter" />
+
+    <Button
+        android:id="@+id/updateBtn"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:hint="Update Profile"
+        android:layout_below="@+id/phone_label"
+        android:layout_alignLeft="@+id/phone_label"
+        android:layout_alignStart="@+id/phone_label"
+        android:layout_marginTop="94dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 
 </RelativeLayout>
