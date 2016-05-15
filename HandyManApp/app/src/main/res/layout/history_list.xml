@@ -14,24 +14,27 @@
     >
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+       >
         <TextView
             android:id="@+id/category_label"
-            android:hint="Category: "
+            android:hint="Category  "
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"
             android:layout_marginRight="10dp"
+
             />
         <TextView
             android:id="@+id/category_value"
             android:hint="The Category"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_alignTop="@+id/category_label"
             android:layout_toRightOf="@+id/category_label"
             android:layout_toEndOf="@+id/category_label"
@@ -40,20 +43,20 @@
             />
         <TextView
         android:id="@+id/date_label"
-        android:hint="Date        : "
+        android:hint="Date          "
         android:textStyle="bold"
-        android:textSize="18sp"
-        android:layout_width="80dp"
-        android:layout_height="25dp"
+        android:textSize="18dp"
+        android:layout_width="85dp"
+        android:layout_height="wrap_content"
         android:layout_marginRight="10dp"
         android:layout_below="@+id/category_label"
         />
         <TextView
             android:id="@+id/date_value"
             android:hint="The Date"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_alignTop="@+id/date_label"
             android:layout_toRightOf="@+id/date_label"
             android:layout_toEndOf="@+id/date_label"
@@ -62,11 +65,11 @@
             />
         <TextView
             android:id="@+id/worker_label"
-            android:hint="Name      : "
+            android:hint="Name        "
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/date_label"
             android:layout_alignRight="@+id/date_label"
             android:layout_alignEnd="@+id/date_label" />
@@ -74,23 +77,24 @@
         <TextView
             android:id="@+id/worker_value"
             android:hint="Worker Name"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_alignTop="@+id/worker_label"
             android:layout_toEndOf="@+id/worker_label"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_alignLeft="@+id/date_value"
-            android:layout_alignStart="@+id/date_value" />
+            android:layout_alignStart="@+id/date_value"
+            android:layout_toRightOf="@+id/worker_label" />
 
         <TextView
             android:id="@+id/address_label"
-            android:hint="Address : "
+            android:hint="Address   "
             android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/worker_label"
             android:layout_alignRight="@+id/worker_label"
             android:layout_alignEnd="@+id/worker_label" />
@@ -98,15 +102,16 @@
         <TextView
             android:id="@+id/address_value"
             android:hint="Address"
-            android:textSize="18sp"
-            android:layout_width="80dp"
-            android:layout_height="25dp"
+            android:textSize="18dp"
+            android:layout_width="85dp"
+            android:layout_height="wrap_content"
             android:layout_alignTop="@+id/address_label"
             android:layout_toEndOf="@+id/address_label"
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:layout_alignLeft="@+id/date_value"
-            android:layout_alignStart="@+id/date_value" />
+            android:layout_alignStart="@+id/date_value"
+            android:layout_toRightOf="@+id/address_label" />
 
 
     </RelativeLayout>
