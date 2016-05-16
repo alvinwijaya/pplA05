@@ -16,7 +16,7 @@
     <application
         android:name=".AppController"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_handyman"
+        android:icon="@drawable/handymanicoo"
         android:label="@string/app_name"
         android:theme="@style/MyMaterialTheme" >
         <activity
