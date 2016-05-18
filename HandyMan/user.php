@@ -38,6 +38,7 @@ $app->post('/getmeworker','getMeWorker');
 $app->post('/getallworker','getAllWorker');
 $app->post('/voteworker','voteWorker');
 $app->post('/history','getHistory');
+$app->post('/updateprofile','updateProfile');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -53,6 +54,54 @@ $app->delete(
         echo 'This is a DELETE route';
     }
 );
+function updateProfile(){
+	$app = \Slim\Slim::getInstance();
+	try{
+		$db = connectDB();
+		$username = $app->request->post('username');
+		$phone = $app->request->post('phone');
+		$address = $app->request->post('address');
+		$password = sha1($app->request->post('password'));
+		$new_password = $app->request->post('new_password');
+		$legal_check_sql = "SELECT * FROM user WHERE username='$username' AND password='$password'";
+		$result = $db->query($legal_check_sql);
+		$fetch = $result->fetch(PDO::FETCH_ASSOC);
+		if (empty($fetch)) {
+			echo "Wrong username or password";
+		} else {
+			if (strcmp($new_password, "") == 0 ) {
+				if (strcmp($address, "") !== 0 and strcmp($phone, "") == 0) {
+					$update_sql = "UPDATE user SET address='$address' WHERE username='$username'";
+					$db->query($update_sql);
+				} else if(strcmp($address, "") == 0 and strcmp($phone, "") !== 0){
+					$update_sql = "UPDATE user SET phone='$phone' WHERE username='$username'";
+					$db->query($update_sql);
+				}else{
+					$update_sql = "UPDATE user SET phone='$phone',address='$address' WHERE username='$username'";
+					$db->query($update_sql);
+				}	
+			}
+			else{
+				$new_password = sha1($new_password);
+				if (strcmp($address, "") !== 0 and strcmp($phone, "") == 0) {
+					$update_sql = "UPDATE user SET address='$address',password='$new_password' WHERE username='$username'";
+					$db->query($update_sql);
+				} else if(strcmp($address, "") == 0 and strcmp($phone, "") !== 0){
+					$update_sql = "UPDATE user SET phone='$phone',password='$new_password' WHERE username='$username'";
+					$db->query($update_sql);
+				}else{
+					$update_sql = "UPDATE user SET phone='$phone',address='$address',password='$new_password' WHERE username='$username'";
+					$db->query($update_sql);
+				}	
+			}
+			
+		}
+		
+	}
+	catch (Exception $e){
+		echo $e;
+	}
+}
 function voteWorker(){
 	$app = \Slim\Slim::getInstance();
 	try{
@@ -80,8 +129,8 @@ function voteWorker(){
 	catch (Exception $e){
 		echo "Something Wrong";
 	}
-	
 }
+
 function getHistory(){
 	$app = \Slim\Slim::getInstance();
 	$order_list = array();
