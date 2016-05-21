@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+    android:layout_height="match_parent"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Profile"
+        android:fontFamily="sans-serif"
+        android:textSize="20dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textStyle="bold"
+        android:id="@+id/textView2"
+        android:gravity="center_horizontal"
+        android:padding="10dp"/>
     <TextView
         android:id="@+id/address_label"
         android:hint="Address"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:layout_width="80dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginLeft="10dp"/>
-
-    <TextView
-        android:id="@+id/address_delimiter"
-        android:layout_width="10dp"
-        android:layout_height="40dp"
-        android:hint=":"
-        android:layout_alignTop="@+id/address_label"
-        android:layout_toRightOf="@+id/address_label" />
+        android:layout_marginLeft="10dp"
+        android:layout_below="@+id/textView2"/>
 
     <EditText
         android:id="@+id/profile_address_value"
@@ -30,11 +34,10 @@
         android:layout_height="40dp"
         android:hint="Your address"
         android:textSize="15sp"
-        android:layout_alignTop="@+id/address_delimiter"
-        android:layout_toRightOf="@+id/address_delimiter"
+        android:layout_alignBottom="@+id/address_label"
+        android:layout_toRightOf="@+id/address_label"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/address_delimiter" />
+        android:layout_alignParentEnd="true" />
 
 
 
@@ -52,14 +55,7 @@
         android:layout_marginLeft="10dp"
         android:layout_below="@+id/address_label"/>
 
-    <TextView
-        android:id="@+id/phone_delimiter"
-        android:layout_width="10dp"
-        android:layout_height="40dp"
-        android:hint=":"
-        android:layout_below="@+id/address_delimiter"
-        android:layout_alignTop="@+id/phone_label"
-        android:layout_toRightOf="@+id/phone_label" />
+
 
     <EditText
         android:id="@+id/phone_value"
@@ -70,20 +66,19 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignLeft="@id/profile_address_value"
-        android:layout_alignStart="@id/profile_address_value"
-        android:layout_alignTop="@+id/phone_delimiter" />
+        android:layout_alignBottom="@+id/phone_label" />
 
     <Button
         android:id="@+id/updateBtn"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:hint="Update Profile"
+        android:background="@drawable/button_invisible"
+        android:textColorHint="@color/colorPrimaryDark"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:hint="UPDATE"
         android:layout_below="@+id/phone_label"
-        android:layout_alignLeft="@+id/phone_label"
-        android:layout_alignStart="@+id/phone_label"
-        android:layout_marginTop="94dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        />
 
 
 </RelativeLayout>
