@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -43,6 +45,9 @@ public class RegisterActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+		
+		final Animation animScale = AnimationUtils.loadAnimation(this, R.anim.anim_scale);
+		
         inputUsername = (EditText) findViewById(R.id.username);
         inputName = (EditText) findViewById(R.id.name);
         inputAddress = (EditText) findViewById(R.id.address);
@@ -69,6 +74,7 @@ public class RegisterActivity extends Activity {
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+				v.startAnimation(animScale);
                 String username = inputUsername.getText().toString().trim();
                 String name = inputName.getText().toString();
                 String address = inputAddress.getText().toString();

@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,12 +48,20 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+		final Animation animScale = AnimationUtils.loadAnimation(getActivity(), R.anim.anim_scale);					 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         phoneNumber = (EditText) view.findViewById(R.id.phone_value);
         address = (EditText) view.findViewById(R.id.profile_address_value);
         updateBtn = (Button) view.findViewById(R.id.updateBtn);
 
+		updateBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        v.startAnimation(animScale);
+                    }
+                });
+		
         return view;
     }
 
