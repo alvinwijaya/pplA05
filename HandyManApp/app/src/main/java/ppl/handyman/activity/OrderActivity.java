@@ -219,7 +219,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         totalWorker.addTextChangedListener(estimateCostWatcher);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {-
+            public void onClick(View v) {
 				v.startAnimation(animScale);
                 boolean orderAccepted = putOrder(filtered);
                 if(orderAccepted){
