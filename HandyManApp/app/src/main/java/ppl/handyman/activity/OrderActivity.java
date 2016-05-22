@@ -22,6 +22,8 @@ import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.TextView;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -78,6 +80,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
+		final Animation animScale = AnimationUtils.loadAnimation(this, R.anim.anim_scale);
         session = new SessionHandler(getApplicationContext());
         sqlhandler = new SQLiteHandler(getApplicationContext());
         locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -216,7 +219,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         totalWorker.addTextChangedListener(estimateCostWatcher);
         orderBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {-
+				v.startAnimation(animScale);
                 boolean orderAccepted = putOrder(filtered);
                 if(orderAccepted){
                     Intent intent = new Intent(getApplicationContext(),WaitOrderActivity.class);
