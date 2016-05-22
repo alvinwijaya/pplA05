@@ -38,6 +38,8 @@ $app->get('/get',function() {
 // POST route .method name
 $app->post('/login', 'login');
 $app->post('/getorder','getOrderAndUpdateLocation');
+$app->post('/acceptorder','acceptOrder');
+$app->post('/gethistory','getHistory');
 // PUT route
 $app->put('/put',function() {
 	echo "This is PUT";
@@ -129,6 +131,7 @@ function getOrderAndUpdateLocation(){
 						'error' => false,
 						'user_name' => $fetch_get->name,
 						'phone' => $fetch_get->phone,
+						'user_order_id' => $row['id'],
 						'date' => $row['date'],
 						'order_status' => $row['order_status'],
 						'total_worker' => $row['total_worker'],
@@ -153,6 +156,53 @@ function getOrderAndUpdateLocation(){
 	}
 }
 
+function acceptOrder(){
+	$app = \Slim\Slim::getInstance();
+	$error = false;
+	$status = $app->request->post('status');
+	$id = $app->request->post('user_order_id');
+	$worker = $app->request->post('worker_username');
+	$db = connectDB();
+	$sql = "UPDATE user_order SET order_status='$status' WHERE id='$id'";
+	$result = $db->query($sql);
+	$sql_insert = "INSERT INTO worker_order (user_order_id,worker_username) VALUES ('$id','$worker')";
+	$result_insert = $db->query($sql_insert);
+	$res = to_json(false,"status update & insert worker");
+	echo $res;
+}
+
+function getHistory(){
+	$app = \Slim\Slim::getInstance();
+	$order_list = array();
+	try{
+		$db = connectDB();
+		$worker_username = $app->request->post('worker_username');
+		$sql = "SELECT user_order_id FROM worker_order WHERE worker_username='$worker_username'";
+		$order = $db->query($sql);
+		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
+		foreach ($fetch_order as $row) {
+			$user_order_id = $row['user_order_id'];
+			$sql_getOrder = "SELECT * FROM user_order WHERE id='$user_order_id'";
+			$getOrder = $db->query($sql_getOrder);
+			$fetch_getOrder = $getOrder->fetchAll(PDO::FETCH_ASSOC);
+			foreach ($fetch_getOrder as $values) {
+				array_push($order_list, 
+				array(
+						'user_username' => $values['user_username'],
+						'date' => $values['date'],
+						'category'=>$values['category'],
+						'total_worker' =>$values['total_worker'],
+						'address'=>$values['address']
+					)
+				);
+			}
+		}
+		$result = json_encode($order_list);
+		echo $result;
+	}catch (Exception $e){
+		echo "Something Wrong";
+	}
+}
 
 function to_json($error,$message){
 	$row = array('error' => $error, 'message' => $message);
