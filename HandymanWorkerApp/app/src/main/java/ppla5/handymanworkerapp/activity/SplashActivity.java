@@ -28,7 +28,7 @@ import ppla5.handymanworkerapp.handler.SessionHandler;
  */
 public class SplashActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
     // Splash screen timer
-    private static int SPLASH_TIME_OUT = 4000;
+    private static int SPLASH_TIME_OUT = 5000;
     private SessionHandler session;
     public static double latitude, longitude;
     private GoogleApiClient mClient;
@@ -56,7 +56,7 @@ public class SplashActivity extends AppCompatActivity implements GoogleApiClient
             alertLocation.setNegativeButton("DISAGREE", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Intent i = new Intent(getApplicationContext(), DashboardActivity.class);
+                    Intent i = new Intent(getApplicationContext(), SplashActivity.class);
                     dialog.dismiss();
                     startActivity(i);
                     finish();

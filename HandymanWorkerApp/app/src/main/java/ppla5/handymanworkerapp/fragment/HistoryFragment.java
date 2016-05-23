@@ -47,7 +47,6 @@ public class HistoryFragment extends Fragment {
         session = new SessionHandler(getContext());
         history = new ArrayList<>();
         getHistory();
-
         historyCardAdapter = new HistoryCardAdapter(history, getContext());
     }
 

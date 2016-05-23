@@ -53,13 +53,14 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     private SessionHandler session;
     private final double DISTANCE_TO_WORKER = 5000;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private Maps maps;
+    private SplashActivity splash;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sql = new SQLiteHandler(getContext());
         session = new SessionHandler(getContext());
         filtered = new ArrayList<>();
+        splash = new SplashActivity();
     }
 
     @Override
@@ -154,7 +155,9 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         }
                         prepareOrderData(filtered);
                     } else {
-                        Log.d("error","Current Loc = null");
+                        Toast.makeText(getContext(), "Current Location = null. Please restart application", Toast.LENGTH_LONG).show();
+                        // stopping swipe refresh
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 } catch (JSONException e) {
                     Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
