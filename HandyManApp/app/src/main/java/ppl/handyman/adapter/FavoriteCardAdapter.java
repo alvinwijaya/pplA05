@@ -3,7 +3,12 @@ package ppl.handyman.adapter;
 /**
  * Created by ASUS on 5/7/2016.
  */
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,12 +38,14 @@ public class FavoriteCardAdapter extends RecyclerView.Adapter<FavoriteViewHolder
     public ArrayList<Worker> favoriteWorker;
     public TreeSet<Worker> hasNotRatedWorker;
     public Context context;
+    public FragmentActivity act;
     private SessionHandler session;
 
-    public FavoriteCardAdapter(ArrayList<Worker> fav, TreeSet<Worker> hasRated, Context context) {
+    public FavoriteCardAdapter(ArrayList<Worker> fav, TreeSet<Worker> hasRated, Context context, FragmentActivity a) {
         this.favoriteWorker = fav;
         this.hasNotRatedWorker = hasRated;
         this.context = context;
+        this.act = a;
         session = new SessionHandler(context);
     }
 
@@ -53,7 +60,6 @@ public class FavoriteCardAdapter extends RecyclerView.Adapter<FavoriteViewHolder
     public void onBindViewHolder(final FavoriteViewHolder holder, int position) {
         //String name = favoriteWorker.get(position).getName();
         String url = favoriteWorker.get(position).getPhotoLink();
-
         if(favoriteWorker != null && !favoriteWorker.isEmpty()){
             final Worker worker = favoriteWorker.get(position);
             holder.category.setText(worker.getCategory());
@@ -64,12 +70,14 @@ public class FavoriteCardAdapter extends RecyclerView.Adapter<FavoriteViewHolder
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        voteWorker(worker.getUsername(),holder);
+                        voteWorker(worker.getUsername(), holder);
                         holder.rating_button.setVisibility(View.GONE);
+                        holder.ratingBar.setVisibility(View.GONE);
                     }
                 });
             }else {
                 holder.rating_button.setVisibility(View.GONE);
+                holder.ratingBar.setVisibility(View.GONE);
             }
         }
     }

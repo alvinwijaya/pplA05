@@ -52,7 +52,7 @@ public class FavoriteFragment extends Fragment {
         getWorkerThatHaveWorkedForMe();
         getWorkerThatHaveVoted();
 
-        favoriteCardAdapter = new FavoriteCardAdapter(workerList,hasVoted,getContext());
+        favoriteCardAdapter = new FavoriteCardAdapter(workerList,hasVoted,getContext(),getActivity());
     }
 
     @Override
