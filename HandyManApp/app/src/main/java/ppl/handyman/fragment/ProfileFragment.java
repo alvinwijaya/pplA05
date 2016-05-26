@@ -1,5 +1,7 @@
 package ppl.handyman.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,7 @@ import java.util.Map;
 
 import ppl.handyman.AppController;
 import ppl.handyman.R;
+import ppl.handyman.activity.OrderActivity;
 import ppl.handyman.custom_object.Worker;
 import ppl.handyman.handler.SessionHandler;
 
@@ -59,17 +62,30 @@ public class ProfileFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         v.startAnimation(animScale);
+                        if(address.getText().toString().equals("") || phoneNumber.getText().toString().equals("")){
+                            AlertDialog.Builder alertLocation = new AlertDialog.Builder(getContext());
+                            alertLocation.setMessage("Please insert new address and phone number");
+                            alertLocation.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            });
+                            alertLocation.create().show();
+                        }
+                        updateProfile(address.getText().toString(),phoneNumber.getText().toString());
                     }
                 });
 		
         return view;
     }
 
-    public void updateProfile(String newAddress, String newPhone){
-        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/getmeworker", new Response.Listener<String>() {
+    public void updateProfile(final String newAddress, final String newPhone){
+        StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/updateprofile", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 Toast.makeText(getContext(),"your Profile was updated",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),newPhone+" "+newAddress,Toast.LENGTH_SHORT).show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -82,11 +98,11 @@ public class ProfileFragment extends Fragment {
                 Map<String,String> map = new HashMap<>();
                 Log.d("username",session.getUsername());
                 String username = session.getUsername();
-                String phone = phoneNumber.getText().toString();
-                String adress = address.getText().toString();
+                String phone = newPhone;
+                String adress = newAddress;
                 map.put("username", username);
                 map.put("phone",phone);
-                map.put("address",adress);
+                map.put("address", adress);
                 return map;
             }
         };

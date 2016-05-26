@@ -52,7 +52,7 @@ public class FavoriteCardAdapter extends RecyclerView.Adapter<FavoriteViewHolder
     @Override
     public void onBindViewHolder(final FavoriteViewHolder holder, int position) {
         //String name = favoriteWorker.get(position).getName();
-        String url = "http://reyzan.cloudapp.net/HandyMan/img/2.jpg";
+        String url = favoriteWorker.get(position).getPhotoLink();
 
         if(favoriteWorker != null && !favoriteWorker.isEmpty()){
             final Worker worker = favoriteWorker.get(position);

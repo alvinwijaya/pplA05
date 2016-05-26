@@ -61,47 +61,21 @@ function updateProfile(){
 		$username = $app->request->post('username');
 		$phone = $app->request->post('phone');
 		$address = $app->request->post('address');
-		$password = sha1($app->request->post('password'));
-		$new_password = $app->request->post('new_password');
-		$legal_check_sql = "SELECT * FROM user WHERE username='$username' AND password='$password'";
+		$legal_check_sql = "SELECT * FROM user WHERE username='$username'";
 		$result = $db->query($legal_check_sql);
 		$fetch = $result->fetch(PDO::FETCH_ASSOC);
 		if (empty($fetch)) {
-			echo "Wrong username or password";
+			echo "Username not exists";
 		} else {
-			if (strcmp($new_password, "") == 0 ) {
-				if (strcmp($address, "") !== 0 and strcmp($phone, "") == 0) {
-					$update_sql = "UPDATE user SET address='$address' WHERE username='$username'";
-					$db->query($update_sql);
-				} else if(strcmp($address, "") == 0 and strcmp($phone, "") !== 0){
-					$update_sql = "UPDATE user SET phone='$phone' WHERE username='$username'";
-					$db->query($update_sql);
-				}else{
-					$update_sql = "UPDATE user SET phone='$phone',address='$address' WHERE username='$username'";
-					$db->query($update_sql);
-				}	
-			}
-			else{
-				$new_password = sha1($new_password);
-				if (strcmp($address, "") !== 0 and strcmp($phone, "") == 0) {
-					$update_sql = "UPDATE user SET address='$address',password='$new_password' WHERE username='$username'";
-					$db->query($update_sql);
-				} else if(strcmp($address, "") == 0 and strcmp($phone, "") !== 0){
-					$update_sql = "UPDATE user SET phone='$phone',password='$new_password' WHERE username='$username'";
-					$db->query($update_sql);
-				}else{
-					$update_sql = "UPDATE user SET phone='$phone',address='$address',password='$new_password' WHERE username='$username'";
-					$db->query($update_sql);
-				}	
-			}
-			
+			$update_sql = "UPDATE user SET address='$address',phone='$phone' WHERE username='$username'";
+			$db->query($update_sql);
 		}
-		
 	}
 	catch (Exception $e){
 		echo $e;
 	}
 }
+
 function voteWorker(){
 	$app = \Slim\Slim::getInstance();
 	try{
@@ -259,13 +233,12 @@ function putOrder(){
 	$total_worker = $app->request->post('total_worker');
 	$date = $app->request->post('date');
 	$rating = $app->request->post("rating");
-	$review = $app->request->post("review");
 	$details = $app->request->post("details");
 	$address = $app->request->post("address");
 	$latittude = $app->request->post("latitude");
 	$longitude = $app->request->post("longitude");
 	
-	$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,review,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$review','$details','$address','$latittude','$longitude')";
+	$sql = "insert into user_order (user_username, date, order_status,total_worker,category,rating,details,address,latitude,longitude) values ('$username','$date','$order_status','$total_worker','$category','$rating','$details','$address','$latittude','$longitude')";
 	$result = $db->query($sql);
 	// $order_id_sql = "SELECT * FROM user_order WHERE id = (SELECT MAX(id) FROM user_order)";
 	// $result= $db->query($order_id_sql);

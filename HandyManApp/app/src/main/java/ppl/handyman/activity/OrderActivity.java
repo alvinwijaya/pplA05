@@ -8,6 +8,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
@@ -29,9 +30,12 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -42,14 +46,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.IOException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import ppl.handyman.AppController;
 import ppl.handyman.fragment.MapFragment;
 import ppl.handyman.R;
@@ -70,7 +80,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private EditText detailWork;
     private EditText totalWorker;
     private TextView estimateCost;
-    private boolean firstTime = false;
     private final double DISTANCE_TO_WORKER = 5000;
     private double latitude;
     private double longitude;
@@ -89,9 +98,11 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         detailWork = (EditText) findViewById(R.id.detailWork);
         totalWorker = (EditText) findViewById(R.id.numberWorker);
         estimateCost = (TextView) findViewById(R.id.estimateCost);
+
         if(estimateCost.getText().toString().equals("")){
             estimateCost.setText("Rp "+String.format("%,.2f",0.0));
         }
+
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
             alertLocation.setMessage("Let Google help apps to determine location. This means sending anonymous location data to Google.").setTitle("Use Location?");
@@ -115,7 +126,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 }
             });
             alertLocation.create().show();
-            turnGPSOn();
         }
         if(checkPlayServices()){
             if (mClient == null) {
@@ -123,10 +133,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         .addConnectionCallbacks(this)
                         .addOnConnectionFailedListener(this)
                         .addApi(LocationServices.API)
-                        .build();
+                        .addApi(AppIndex.API).build();
             }
         }
-        setUpMapIfNeeded();
         address = (EditText) findViewById(R.id.searchLocation);
         address.setScroller(new Scroller(getApplicationContext()));
         address.setMaxLines(1);
@@ -149,6 +158,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
             @Override
             public void afterTextChanged(Editable s) {
+
                 try {
                     String address_value = address.getText().toString().trim();
                     if(address_value.equals("")){
@@ -174,7 +184,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             public void run() {
-                                putMarkerWithoutCurrentLocation();
+                                putMarker();
                                 mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Your Location"));
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
                             }
@@ -182,7 +192,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
                     } else {
                         //this location supposed to be your current location (still hardcoded)
-                        putMarkerWithoutCurrentLocation();
+                        putMarker();
                         mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Location"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
                     }
@@ -221,15 +231,26 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             @Override
             public void onClick(View v) {
 				v.startAnimation(animScale);
-                boolean orderAccepted = putOrder(filtered);
+                boolean orderAccepted = putOrder();
                 if(orderAccepted){
-                    Intent intent = new Intent(getApplicationContext(),WaitOrderActivity.class);
-                    startActivity(intent);
-                    finish();
+                    final Intent intent = new Intent(getApplicationContext(),DashboardActivity.class);
+
+                    AlertDialog.Builder alertLocation = new AlertDialog.Builder(OrderActivity.this);
+                    alertLocation.setMessage("Thank You For Ordering!");
+                    alertLocation.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    alertLocation.create().show();
+
                 }
             }
         });
-
+        setUpMapIfNeeded();
     }
 
     private boolean checkPlayServices() {
@@ -252,7 +273,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     public void putMarker(){
         mMap.clear();
-        setUpMap();
         for(JSONObject json: this.filtered){
             try {
                 mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
@@ -263,19 +283,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         }
     }
 
-    public void putMarkerWithoutCurrentLocation(){
-        mMap.clear();
-        for(JSONObject json: this.filtered){
-            try {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
-                Log.d("Marker", "Marker was added");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public boolean putOrder(final ArrayList<JSONObject> workers){
+    public boolean putOrder(){
         Log.d("Order", "Order is being sent");
         StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/putorder", new Response.Listener<String>() {
             @Override
@@ -326,14 +334,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     public void getWorker(final String[] picked){
 
-
         StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/user.php/getworker", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
                 try{
                     JSONArray jsonArr = new JSONArray(s);
                     filtered.clear();
-                    Log.d("JSONResult:",jsonArr.toString());
+                    Log.d("JSONResultWorker:",jsonArr.toString());
                     if (currentLoc!=null){
                         for(int ii =0; ii < jsonArr.length();ii++){
 
@@ -351,12 +358,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     }else {
                         Log.d("","Current loc null");
                     }
-                    if(firstTime){
-                        firstTime = !firstTime;
-                        putMarker();
-                    }
                 }catch (JSONException e){
-
+                    Log.e("Error", e.toString());
                 }
             }
         }, new Response.ErrorListener() {
@@ -386,7 +389,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     protected void onStop() {
         super.onStop();
-        turnGPSOff();
+        mClient.disconnect();
     }
 
     @Override
@@ -399,14 +402,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     @Override
     protected void onResume() {
         super.onResume();
-        setUpMapIfNeeded();
-        turnGPSOn();
     }
 
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * call {@link #} once when {@link #mMap} is not null.
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
@@ -424,8 +425,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             // Try to obtain the map from the SupportMapFragment.
             mMap = ((MapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
+            mMap.setMyLocationEnabled(true);
             final ScrollView scrollView = (ScrollView) findViewById(R.id.scroll);
-            ((MapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).setListener(new MapFragment.OnTouchListener(){
+            ((MapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).setListener(new MapFragment.OnTouchListener() {
                 @Override
                 public void onTouch() {
                     scrollView.requestDisallowInterceptTouchEvent(true);
@@ -433,12 +435,10 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             });
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
-
-                setUpMap();
-                String[] picked = session.getPickedCategory();
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(final LatLng latLng) {
+
                         if(currentLoc != null) {
                             currentLoc.setLatitude(latLng.latitude);
                             currentLoc.setLongitude(latLng.longitude);
@@ -458,19 +458,15 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             public void run() {
-                                putMarkerWithoutCurrentLocation();
+                                putMarker();
                                 mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
                             }
-                        }, 1000);
-
+                        }, 500);
 
                     }
                 });
-            }else{
-                putMarker();
             }
-
         }
     }
 
@@ -480,62 +476,40 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
      * <p/>
      * This should only be called once and when we are sure that {@link #mMap} is not null.
      */
-    private void setUpMap() {
-        //this location supposed to be your current location (still hardcoded)
-        mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("Your Location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 17.0f));
-    }
 
     @Override
     public void onConnected(Bundle bundle) {
-        Log.d("Connected","Now connected");
         currentLoc = LocationServices.FusedLocationApi.getLastLocation(mClient);
         if(currentLoc != null){
+            Log.d("Location",currentLoc.getLatitude()+" "+currentLoc.getLongitude());
             latitude = currentLoc.getLatitude();
             longitude = currentLoc.getLongitude();
-            Geocoder geocoder = new Geocoder(getApplicationContext());
-            try {
-                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                address.setText(addresses.get(0).getFeatureName());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.d("Location: ", latitude + " " + longitude);
-            String [] picked = session.getPickedCategory();
+            LatLng myLocation = new LatLng(currentLoc.getLatitude(), currentLoc.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(myLocation));
+            String[] picked = session.getPickedCategory();
             getWorker(picked);
+            setUpMapIfNeeded();
             Handler handler = new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    setUpMapIfNeeded();
+                    Log.d("SettingMap","Putting Marker "+ filtered.size());
+                    putMarker();
+                    Geocoder geocoder = new Geocoder(getApplicationContext());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                        address.setText(addresses.get(0).getFeatureName());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }, 1000);
-
+            },1000);
+        }else {
+            currentLoc = mMap.getMyLocation();
         }
-    }
-    private void turnGPSOn(){
-        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
 
-        if(!provider.contains("gps")){ //if gps is disabled
-            final Intent poke = new Intent();
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-            poke.setData(Uri.parse("3"));
-            sendBroadcast(poke);
-        }
     }
 
-    private void turnGPSOff(){
-        String provider = Settings.Secure.getString(getContentResolver(), Settings.Secure.LOCATION_PROVIDERS_ALLOWED);
-
-        if(provider.contains("gps")){ //if gps is enabled
-            final Intent poke = new Intent();
-            poke.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
-            poke.addCategory(Intent.CATEGORY_ALTERNATIVE);
-            poke.setData(Uri.parse("3"));
-            sendBroadcast(poke);
-        }
-    }
     @Override
     public void onConnectionSuspended(int i) {
 
@@ -543,16 +517,8 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        AlertDialog.Builder alertLocation = new AlertDialog.Builder(this);
-        alertLocation.setMessage("There is no connection available, please enable your cellular data or connect to WiFi").setTitle("Disconnected from Internet");
-        alertLocation.setCancelable(false);
-        alertLocation.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent OptionsIntent = new Intent(Settings.ACTION_NETWORK_OPERATOR_SETTINGS);
-                startActivity(OptionsIntent);
-                finish();
-            }
-        });
+
     }
+
 }
+
