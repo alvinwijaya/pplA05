@@ -1,9 +1,12 @@
 package ppla5.handymanworkerapp.activity;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,7 +29,7 @@ import ppla5.handymanworkerapp.handler.SessionHandler;
 /**
  * Created by Ari on 4/29/2016.
  */
-public class DetailPesanan extends Activity {
+public class DetailPesanan extends AppCompatActivity {
     private String name,description,address,category,date,phone;
     private int total_worker,id;
     private TextView textName,textAddress,textDescription,textCategory,textDate,textTotalWorker,textCost;
@@ -68,8 +71,25 @@ public class DetailPesanan extends Activity {
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                acceptOrder();
-                call();
+                AlertDialog.Builder alertAccept = new AlertDialog.Builder(DetailPesanan.this);
+                alertAccept.setMessage("Are you sure to accept this order?").setTitle("Accept Order?");
+                alertAccept.setCancelable(false);
+                alertAccept.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        acceptOrder();
+                        call();
+                    }
+                });
+                alertAccept.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(),DetailPesanan.class);
+                        dialog.dismiss();
+                        startActivity(intent);
+                        finish();
+                    }
+                });
             }
         });
     }

@@ -4,6 +4,7 @@ package ppla5.handymanworkerapp.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,25 +36,25 @@ import ppla5.handymanworkerapp.custom_object.History;
 /**
  * Created by Ari on 5/22/2016.
  */
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private ArrayList<History> history;
     private SessionHandler session;
     private RecyclerView recyclerView;
     private HistoryCardAdapter historyCardAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         session = new SessionHandler(getContext());
         history = new ArrayList<>();
-        getHistory();
-        historyCardAdapter = new HistoryCardAdapter(history, getContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
+        historyCardAdapter = new HistoryCardAdapter(history, getContext());
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -62,14 +63,32 @@ public class HistoryFragment extends Fragment {
         handler.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
+
                                     recyclerView.setAdapter(historyCardAdapter);
                                 }
                             }
                 , 1000);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        getHistory();
+                                    }
+                                }
+        );
         return view;
     }
 
     public void getHistory(){
+        // showing refresh animation before making http call
+        swipeRefreshLayout.setRefreshing(true);
         StringRequest request = new StringRequest(Request.Method.POST, "http://reyzan.cloudapp.net/HandyMan/worker.php/gethistory", new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
@@ -86,15 +105,21 @@ public class HistoryFragment extends Fragment {
                         History h = new History(name,category,address,date,total_worker);
                         history.add(h);
                     }
+                    historyCardAdapter.notifyDataSetChanged();
+                    // stopping swipe refresh
+                    swipeRefreshLayout.setRefreshing(false);
                 }catch (JSONException e){
-                    Log.d("error",e.getMessage());
                     Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    // stopping swipe refresh
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getContext(),"Something Wrong In Volley", Toast.LENGTH_LONG).show();
+                // stopping swipe refresh
+                swipeRefreshLayout.setRefreshing(false);
             }
         }){
             @Override
@@ -108,4 +133,13 @@ public class HistoryFragment extends Fragment {
         };
         AppController.getInstance().addToRequestQueue(request);
     }
+
+    @Override
+    public void onRefresh() {
+        history.clear();
+        historyCardAdapter.clear();
+        getHistory();
+    }
 }
+
+

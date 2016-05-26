@@ -177,7 +177,7 @@ function getHistory(){
 	try{
 		$db = connectDB();
 		$worker_username = $app->request->post('worker_username');
-		$sql = "SELECT user_order_id FROM worker_order WHERE worker_username='$worker_username'";
+		$sql = "SELECT user_order_id,accepted_date FROM worker_order WHERE worker_username='$worker_username'";
 		$order = $db->query($sql);
 		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($fetch_order as $row) {
@@ -189,7 +189,7 @@ function getHistory(){
 				array_push($order_list, 
 				array(
 						'user_username' => $values['user_username'],
-						'date' => $values['date'],
+						'date' => $row['accepted_date'],
 						'category'=>$values['category'],
 						'total_worker' =>$values['total_worker'],
 						'address'=>$values['address']

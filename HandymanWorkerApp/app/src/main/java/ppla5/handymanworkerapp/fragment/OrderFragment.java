@@ -161,6 +161,8 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     }
                 } catch (JSONException e) {
                     Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    // stopping swipe refresh
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         }, new Response.ErrorListener() {
@@ -192,7 +194,6 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
     public void onRefresh() {
         filtered.clear();
         mAdapter.clear();
-        mAdapter.notifyDataSetChanged();
         getOrder();
     }
 }

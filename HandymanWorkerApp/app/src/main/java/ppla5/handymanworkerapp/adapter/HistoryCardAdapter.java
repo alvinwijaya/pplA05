@@ -36,7 +36,6 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryViewHolder>{
     @Override
     public void onBindViewHolder(final HistoryViewHolder holder, int position) {
         History his = history.get(position);
-        Log.d("total",his.getTotal_worker()+"");
         holder.userName.setText(his.getName());
         holder.category.setText(his.getCategory());
         holder.address.setText(his.getAddress());
@@ -49,5 +48,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryViewHolder>{
     @Override
     public int getItemCount() {
         return history.size();
+    }
+
+    public void clear() {
+        history.clear();
     }
 }
