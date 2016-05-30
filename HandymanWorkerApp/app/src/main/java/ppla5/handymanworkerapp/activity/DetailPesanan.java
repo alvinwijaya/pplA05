@@ -71,12 +71,14 @@ public class DetailPesanan extends AppCompatActivity {
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("masuk","onclick");
                 AlertDialog.Builder alertAccept = new AlertDialog.Builder(DetailPesanan.this);
                 alertAccept.setMessage("Are you sure to accept this order?").setTitle("Accept Order?");
                 alertAccept.setCancelable(false);
                 alertAccept.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        Log.d("masuk","yes");
                         acceptOrder();
                         call();
                     }
@@ -84,12 +86,11 @@ public class DetailPesanan extends AppCompatActivity {
                 alertAccept.setNegativeButton("NO", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(getApplicationContext(),DetailPesanan.class);
+                        Log.d("masuk","no");
                         dialog.dismiss();
-                        startActivity(intent);
-                        finish();
                     }
                 });
+                alertAccept.create().show();
             }
         });
     }

@@ -161,6 +161,7 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                     }
                 } catch (JSONException e) {
                     Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    mAdapter.notifyDataSetChanged();
                     // stopping swipe refresh
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -169,6 +170,7 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getContext(), "Something Wrong In Volley", Toast.LENGTH_LONG).show();
+                mAdapter.notifyDataSetChanged();
                 // stopping swipe refresh
                 swipeRefreshLayout.setRefreshing(false);
             }
