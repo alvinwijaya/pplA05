@@ -3,6 +3,7 @@ package ppl.handyman.fragment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,24 +36,22 @@ import ppl.handyman.adapter.FavoriteCardAdapter;
 /**
  * Created by Ari on 4/12/2016.
  */
-public class FavoriteFragment extends Fragment {
+public class FavoriteFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     private RecyclerView recyclerView;
     private FavoriteCardAdapter favoriteCardAdapter;
-    private ArrayList<Worker> workerList;
+    private TreeSet<Worker> workerList;
     private TreeSet<Worker> hasVoted;
     private SessionHandler session;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private ArrayList<Worker> arr;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         session = new SessionHandler(getContext());
-        workerList = new ArrayList<>();
+        workerList = new TreeSet<>();
         hasVoted = new TreeSet<>();
-
-        getWorkerThatHaveWorkedForMe();
-        getWorkerThatHaveVoted();
-
-        favoriteCardAdapter = new FavoriteCardAdapter(workerList,hasVoted,getContext(),getActivity());
+        arr = new ArrayList<>();
     }
 
     @Override
@@ -64,14 +63,30 @@ public class FavoriteFragment extends Fragment {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
+        favoriteCardAdapter = new FavoriteCardAdapter(arr,hasVoted,getContext(),getActivity());
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    recyclerView.setAdapter(favoriteCardAdapter);
+            @Override
+            public void run() {
+                recyclerView.setAdapter(favoriteCardAdapter);
+            }
+        }, 1000);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        /**
+         * Showing Swipe Refresh animation on activity create
+         * As animation won't start on onCreate, post runnable is used
+         */
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        getWorkerThatHaveWorkedForMe();
+                                        getWorkerThatHaveVoted();
+                                    }
                                 }
-                            }
-               , 1000);
+        );
+
         return view;
     }
     public void getWorkerThatHaveVoted(){
@@ -80,7 +95,7 @@ public class FavoriteFragment extends Fragment {
             public void onResponse(String s) {
                 try{
                     JSONArray jsonArr = new JSONArray(s);
-                    Log.d("JSONResult:", jsonArr.toString());
+                    Log.d("JSONResult have voted:", jsonArr.toString());
                     for(int ii =0; ii < jsonArr.length();ii++){
                         JSONObject json = jsonArr.getJSONObject(ii);
                         String name = json.getString("name");
@@ -91,15 +106,18 @@ public class FavoriteFragment extends Fragment {
                         Worker worker = new Worker(username,name,photoLink,tag,rating);
                         hasVoted.add(worker);
                     }
+                    swipeRefreshLayout.setRefreshing(false);
                 }catch (JSONException e){
                     Log.d("error",e.getMessage());
                     Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+                swipeRefreshLayout.setRefreshing(false);
             }
         }){
             @Override
@@ -131,15 +149,20 @@ public class FavoriteFragment extends Fragment {
                         Worker worker = new Worker(username,name,tag,photoLink,rating);
                         workerList.add(worker);
                     }
+                    arr.clear();
+                    arr.addAll(workerList);
+                    swipeRefreshLayout.setRefreshing(false);
                 }catch (JSONException e){
                     Log.d("error",e.getMessage());
                     Toast.makeText(getContext(), "JSON Error getWorkerThatHaveWorkedForMe" + e.getMessage(), Toast.LENGTH_LONG).show();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+                swipeRefreshLayout.setRefreshing(false);
             }
         }){
             @Override
@@ -152,5 +175,16 @@ public class FavoriteFragment extends Fragment {
             }
         };
         AppController.getInstance().addToRequestQueue(request);
+    }
+
+    @Override
+    public void onRefresh() {
+        workerList.clear();
+        hasVoted.clear();
+        arr.clear();
+        favoriteCardAdapter.clear();
+        getWorkerThatHaveWorkedForMe();
+        getWorkerThatHaveVoted();
+
     }
 }

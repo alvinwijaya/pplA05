@@ -40,6 +40,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONArray;
@@ -111,8 +113,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(gpsOptionsIntent);
-                    finish();
+                    startActivityForResult(gpsOptionsIntent, 1);
                 }
             });
             alertLocation.setNegativeButton("DISAGREE", new DialogInterface.OnClickListener() {
@@ -163,7 +164,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     String address_value = address.getText().toString().trim();
                     if(address_value.equals("")){
                         Log.d("Location Default","Location is set to default");
-                        mMap.addMarker(new MarkerOptions().position(new LatLng(-6.5801552, 106.7651841)).title("Your Location"));
+                        mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(-6.5801552, 106.7651841)).title("Your Location")
+                                .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(-6.5801552, 106.7651841), 17.0f));
                         return;
                     }
@@ -185,7 +188,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         handler.postDelayed(new Runnable() {
                             public void run() {
                                 putMarker();
-                                mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lgn)).title("Your Location"));
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(lat, lgn)).title("Your Location")
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lgn), 17.0f));
                             }
                         }, 500);
@@ -275,7 +280,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         mMap.clear();
         for(JSONObject json: this.filtered){
             try {
-                mMap.addMarker(new MarkerOptions().position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location"));
+                mMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location")
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_worker)));
                 Log.d("Marker", "Marker was added");
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -356,6 +363,10 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         }
                         putMarker();
                     }else {
+                        currentLoc = mMap.getMyLocation();
+                        if(currentLoc != null){
+                            putMarker();
+                        }
                         Log.d("","Current loc null");
                     }
                 }catch (JSONException e){
@@ -459,7 +470,9 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         handler.postDelayed(new Runnable() {
                             public void run() {
                                 putMarker();
-                                mMap.addMarker(new MarkerOptions().position(latLng).title("Your Location"));
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(latLng).title("Your Location")
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
                                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
                             }
                         }, 500);
@@ -506,6 +519,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
             },1000);
         }else {
             currentLoc = mMap.getMyLocation();
+            Log.d("LocationDefault","Set to default location");
         }
 
     }

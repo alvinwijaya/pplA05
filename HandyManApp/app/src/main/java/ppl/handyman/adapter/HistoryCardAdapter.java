@@ -40,7 +40,9 @@ public class HistoryCardAdapter extends RecyclerView.Adapter<HistoryViewHolder>{
         holder.date.setText(his.getDate());
     }
 
-
+    public void clear(){
+        this.history.clear();
+    }
 
     @Override
     public int getItemCount() {

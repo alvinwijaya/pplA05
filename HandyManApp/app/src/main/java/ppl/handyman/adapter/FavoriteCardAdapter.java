@@ -116,4 +116,7 @@ public class FavoriteCardAdapter extends RecyclerView.Adapter<FavoriteViewHolder
     public int getItemCount() {
         return favoriteWorker.size();
     }
+    public void clear(){
+        hasNotRatedWorker.clear();
+    }
 }

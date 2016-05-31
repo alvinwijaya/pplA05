@@ -38,6 +38,7 @@
         <activity
             android:name=".activity.OrderActivity"
             android:label="@string/title_activity_order"
+            android:noHistory="false"
             android:windowSoftInputMode="adjustResize" />
 
         <meta-data

@@ -3,6 +3,7 @@ package ppl.handyman.fragment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,19 +39,18 @@ import ppl.handyman.handler.SessionHandler;
 /**
  * Created by Ari on 4/12/2016.
  */
-public class HistoryFragment extends Fragment {
+public class HistoryFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener{
     private ArrayList<History> history;
     private SessionHandler session;
     private RecyclerView recyclerView;
     private HistoryCardAdapter historyCardAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         session = new SessionHandler(getContext());
         history = new ArrayList<>();
-        getHistory();
 
-        historyCardAdapter = new HistoryCardAdapter(history, getContext());
     }
 
     @Override
@@ -62,7 +62,20 @@ public class HistoryFragment extends Fragment {
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         Handler handler = new Handler();
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
         Collections.sort(history);
+        swipeRefreshLayout.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        history.clear();
+                                        historyCardAdapter.clear();
+                                        getHistory();
+                                    }
+                                }
+        );
+        historyCardAdapter = new HistoryCardAdapter(history, getContext());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -89,15 +102,18 @@ public class HistoryFragment extends Fragment {
                         History h = new History(name,category,address,date);
                         history.add(h);
                     }
+                    swipeRefreshLayout.setRefreshing(false);
                 }catch (JSONException e){
                     Log.d("error",e.getMessage());
                     Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getContext(),"Something Wrong In Volley",Toast.LENGTH_LONG).show();
+                swipeRefreshLayout.setRefreshing(false);
             }
         }){
             @Override
@@ -110,5 +126,12 @@ public class HistoryFragment extends Fragment {
             }
         };
         AppController.getInstance().addToRequestQueue(request);
+    }
+
+    @Override
+    public void onRefresh() {
+        history.clear();
+        historyCardAdapter.clear();
+        getHistory();
     }
 }
