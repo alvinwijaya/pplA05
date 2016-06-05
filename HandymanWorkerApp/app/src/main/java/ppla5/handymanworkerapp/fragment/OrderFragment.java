@@ -160,7 +160,8 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                         swipeRefreshLayout.setRefreshing(false);
                     }
                 } catch (JSONException e) {
-                    Toast.makeText(getContext(), "JSON Error " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "There are no Order around you", Toast.LENGTH_LONG).show();
+                    mAdapter.notifyDataSetChanged();
                     // stopping swipe refresh
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -169,6 +170,7 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Toast.makeText(getContext(), "Something Wrong In Volley", Toast.LENGTH_LONG).show();
+                mAdapter.notifyDataSetChanged();
                 // stopping swipe refresh
                 swipeRefreshLayout.setRefreshing(false);
             }
@@ -179,8 +181,8 @@ public class OrderFragment extends Fragment implements SwipeRefreshLayout.OnRefr
                 Log.d("user",session.getUsername());
                 Log.d("category",session.getCategory());
                 map.put("status", "0");
-                map.put("latitude",latitude+"");
-                map.put("longitude",longitude+"");
+                map.put("latitude",SplashActivity.latitude+"");
+                map.put("longitude",SplashActivity.longitude+"");
                 map.put("username",session.getUsername());
                 map.put("category",session.getCategory());
                 return map;

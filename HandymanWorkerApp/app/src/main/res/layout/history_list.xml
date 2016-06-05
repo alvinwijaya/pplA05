@@ -17,9 +17,9 @@
         android:layout_height="match_parent">
         <TextView
             android:id="@+id/category_label"
-            android:hint="Category: "
+            android:hint="Category "
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_alignParentStart="true"
@@ -29,7 +29,7 @@
         <TextView
             android:id="@+id/category_value"
             android:hint="The Category"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_alignTop="@+id/category_label"
@@ -40,9 +40,9 @@
             />
         <TextView
             android:id="@+id/date_label"
-            android:hint="Date        : "
+            android:hint="Date         "
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_marginRight="10dp"
@@ -51,7 +51,7 @@
         <TextView
             android:id="@+id/date_value"
             android:hint="The Date"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_alignTop="@+id/date_label"
@@ -62,9 +62,9 @@
             />
         <TextView
             android:id="@+id/user_label"
-            android:hint="Name      : "
+            android:hint="Name       "
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_below="@+id/date_label"
@@ -74,7 +74,7 @@
         <TextView
             android:id="@+id/user_value"
             android:hint="User Name"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_alignTop="@+id/user_label"
@@ -87,9 +87,9 @@
 
         <TextView
             android:id="@+id/address_label"
-            android:hint="Address : "
+            android:hint="Address  "
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_below="@+id/user_label"
@@ -99,7 +99,7 @@
         <TextView
             android:id="@+id/address_value"
             android:hint="Address"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_alignTop="@+id/address_label"
@@ -112,9 +112,9 @@
 
         <TextView
             android:id="@+id/total_worker_label"
-            android:hint="Total       :"
+            android:hint="Total       "
             android:textStyle="bold"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_below="@+id/address_label"
@@ -124,7 +124,7 @@
         <TextView
             android:id="@+id/total_worker_value"
             android:hint="Total Worker"
-            android:textSize="18sp"
+            android:textSize="18dp"
             android:layout_width="80dp"
             android:layout_height="25dp"
             android:layout_alignTop="@+id/total_worker_label"

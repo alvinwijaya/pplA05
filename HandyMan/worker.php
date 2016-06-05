@@ -177,7 +177,7 @@ function getHistory(){
 	try{
 		$db = connectDB();
 		$worker_username = $app->request->post('worker_username');
-		$sql = "SELECT user_order_id,accepted_date FROM worker_order WHERE worker_username='$worker_username'";
+		$sql = "SELECT user_order_id,accepted_date FROM worker_order WHERE worker_username='$worker_username' ORDER BY accepted_date";
 		$order = $db->query($sql);
 		$fetch_order = $order->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($fetch_order as $row) {
@@ -186,9 +186,13 @@ function getHistory(){
 			$getOrder = $db->query($sql_getOrder);
 			$fetch_getOrder = $getOrder->fetchAll(PDO::FETCH_ASSOC);
 			foreach ($fetch_getOrder as $values) {
+				$username = $values['user_username'];
+				$sql_getName = "SELECT name FROM user WHERE username='$username'";
+				$getName = $db->query($sql_getName);
+				$fetch_getName = $getName->fetch(PDO::FETCH_OBJ);
 				array_push($order_list, 
 				array(
-						'user_username' => $values['user_username'],
+						'user_username' => $fetch_getName->name,
 						'date' => $row['accepted_date'],
 						'category'=>$values['category'],
 						'total_worker' =>$values['total_worker'],
@@ -203,7 +207,6 @@ function getHistory(){
 		echo "Something Wrong";
 	}
 }
-
 function to_json($error,$message){
 	$row = array('error' => $error, 'message' => $message);
 	return json_encode($row);
