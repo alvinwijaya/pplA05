@@ -85,7 +85,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
     private final double DISTANCE_TO_WORKER = 5000;
     private double latitude;
     private double longitude;
-
+    private TextWatcher watcher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,7 +145,7 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
         /*
         Text watcher is a listener for text when text value changed
          */
-        TextWatcher watcher = new TextWatcher() {
+        watcher = new TextWatcher() {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -284,10 +284,13 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         .position(new LatLng(json.getDouble("latitude"), json.getDouble("longitude"))).title(json.getString("name") + " Location")
                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_worker)));
                 Log.d("Marker", "Marker was added");
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+
     }
 
     public boolean putOrder(){
@@ -363,10 +366,6 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                         }
                         putMarker();
                     }else {
-                        currentLoc = mMap.getMyLocation();
-                        if(currentLoc != null){
-                            putMarker();
-                        }
                         Log.d("","Current loc null");
                     }
                 }catch (JSONException e){
@@ -449,20 +448,25 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                 mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(final LatLng latLng) {
-
+                        double lat = latLng.latitude;
+                        double lgt = latLng.longitude;
+                        address.removeTextChangedListener(watcher);
+                        Log.d("Location Clicked",lat+" "+lgt);
                         if(currentLoc != null) {
-                            currentLoc.setLatitude(latLng.latitude);
-                            currentLoc.setLongitude(latLng.longitude);
-                            latitude = currentLoc.getLatitude();
-                            longitude = currentLoc.getLongitude();
+                            currentLoc.setLatitude(lat);
+                            currentLoc.setLongitude(lgt);
+                            latitude = lat;
+                            longitude = lgt;
+                            Log.d("Location Now",latitude+" "+longitude);
                             Geocoder geocoder = new Geocoder(getApplicationContext());
                             try {
                                 List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                                address.setText(addresses.get(0).getFeatureName());
+                                address.setText(addresses.get(0).getFeatureName() + ", " + addresses.get(0).getLocality() +", " + addresses.get(0).getAdminArea() + ", " + addresses.get(0).getCountryName());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
+                        address.addTextChangedListener(watcher);
                         String[] picked = session.getPickedCategory();
                         getWorker(picked);
                         //delay put marker 1s to make sure request respond is processed properly
@@ -471,11 +475,12 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                             public void run() {
                                 putMarker();
                                 mMap.addMarker(new MarkerOptions()
-                                        .position(latLng).title("Your Location")
+                                        .position(new LatLng(latitude, longitude)).title("Your Location")
                                         .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_user)));
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+                                Log.d("Marker User", "Marker user was added, latitude: " + latitude + " " + "longitude: " + longitude);
                             }
-                        }, 500);
+                        }, 1000);
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
 
                     }
                 });
@@ -511,14 +516,15 @@ public class OrderActivity extends FragmentActivity implements GoogleApiClient.C
                     Geocoder geocoder = new Geocoder(getApplicationContext());
                     try {
                         List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
-                        address.setText(addresses.get(0).getFeatureName());
+                        address.removeTextChangedListener(watcher);
+                        address.setText(addresses.get(0).getFeatureName() + " " + addresses.get(0).getLocality() +" " + addresses.get(0).getAdminArea() + " " + addresses.get(0).getCountryName());
+                        address.addTextChangedListener(watcher);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             },1000);
         }else {
-            currentLoc = mMap.getMyLocation();
             Log.d("LocationDefault","Set to default location");
         }
 
